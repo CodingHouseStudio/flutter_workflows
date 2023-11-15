@@ -107,4 +107,11 @@ jobs:
         run: flutter analyze ${{inputs.analyze_directories}}
 
       - name: 🧪 Run Tests
-        run: flutter test
+        run: very_good test -j ${{inputs.concurrency}} ${{(inputs.test_recursion && '--recursive') || ''}} ${{(inputs.test_optimization && '--optimization') || '--no-optimization'}} --coverage
+
+      - name: 📊 Check Code Coverage
+        uses: VeryGoodOpenSource/very_good_coverage@v2
+        with:
+          path: ${{inputs.working_directory}}/coverage/lcov.info
+          exclude: ${{inputs.coverage_excludes}}
+          min_coverage: ${{inputs.min_coverage}}

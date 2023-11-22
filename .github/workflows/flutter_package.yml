@@ -65,6 +65,7 @@ on:
 env:
   GITHUB_OUTPUT: ${{github.workspace}}/.github/workflows/output.txt
   FLUTTER_VERSION: 3.13.9
+  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 permissions:
   id-token: write   # This is required for requesting the JWT
   contents: write    # This is required for actions/checkout

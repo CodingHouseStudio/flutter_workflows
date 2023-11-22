@@ -122,7 +122,8 @@ jobs:
           exclude: ${{inputs.coverage_excludes}}
           min_coverage: ${{inputs.min_coverage}}
   integration-android:
-    needs: build  # Make the integration job dependent on the build job
+    needs: build
+    timeout-minutes: 15
     runs-on: buildjet-2vcpu-ubuntu-2204
     strategy:
       matrix:
@@ -169,3 +170,27 @@ jobs:
         with:
           name: e2e_output
           path: e2e_output.log
+  integration-web:
+    timeout-minutes: 5
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:' # optional, change this to force refresh cache
+          cache-path: '${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:' # optional, change this to specify the cache path
+          architecture: x64 # optional, x64 or arm64
+          flutter-version: 3.13.9
+      - name: Flutter Pub Get # get flutter packages information
+        run: flutter pub get
+      #      - uses: nanasess/setup-chromedriver@v2
+      #        with:
+      #          # Optional: do not specify to match Chrome's version
+      #          chromedriver-version: '88.0.4324.96'
+      - name: Run Chromedriver and Integration Tests
+        run: |
+          chromedriver --port=4444 --trace-buffer-size=100000 &
+          chmod +x integration_tests.sh && ./integration_tests.sh

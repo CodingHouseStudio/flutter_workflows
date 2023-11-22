@@ -163,7 +163,7 @@ jobs:
           arch: ${{ matrix.arch }}
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           force-avd-creation: false
-          script: flutter test integration_test --flavor development --verbose
+          script: flutter test integration_test --flavor development
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2

@@ -185,6 +185,7 @@ jobs:
           chromedriver --port=4444 --trace-buffer-size=100000 &
           chmod +x integration_tests.sh && ./integration_tests.sh
   slack-notification:
+    if: always()  # Ensures this job runs regardless of the completion status of dependent jobs
     timeout-minutes: 3
     runs-on: ubuntu-latest
     needs:
@@ -192,12 +193,16 @@ jobs:
       - integration-android
       - integration-web
     steps:
-      - name: Check Job Status
+      - name: Determine Job Status
         id: job-status
-        run: echo "::set-output name=job-status::success"
-        if: success()  # Check for success instead of failure
+        run: |
+          if ${{ needs.build.result == 'success' && (needs.integration-android.result == 'success' || needs.integration-android.result == 'skipped') && (needs.integration-web.result == 'success' || needs.integration-web.result == 'skipped') }}; then
+            echo "::set-output name=job-status::success"
+          else
+            echo "::set-output name=job-status::failure"
+          fi
 
-      - name: Notify Slack
+      - name: Notify Slack on Success
         if: steps.job-status.outputs.job-status == 'success'
         uses: rtCamp/action-slack-notify@v2
         env:
@@ -205,9 +210,8 @@ jobs:
           SLACK_MESSAGE: "Build successful for ${{ github.repository }} on branch ${{ github.ref }}. Check ${{ github.event_name }} ${{ github.event.workflow_run.event }} for more details."
 
       - name: Notify Slack on Failure
-        if: failure()  # Notify on failure
+        if: steps.job-status.outputs.job-status == 'failure'
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_MESSAGE: "Build failed for ${{ github.repository }} on branch ${{ github.ref }}. Check ${{ github.event_name }} ${{ github.event.workflow_run.event }} for more details."
-

@@ -156,7 +156,6 @@ jobs:
     timeout-minutes: 5
     needs:
       - build
-      - integration-android
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.1.1

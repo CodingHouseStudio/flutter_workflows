@@ -185,3 +185,21 @@ jobs:
         run: |
           chromedriver --port=4444 --trace-buffer-size=100000 &
           chmod +x integration_tests.sh && ./integration_tests.sh
+  slack-notification:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+      - integration-android
+      - integration-web
+    steps:
+      - name: Check Job Status
+        id: job-status
+        run: echo "::set-output name=job-status::success"
+        if: success()  # Check for success instead of failure
+
+      - name: Notify Slack
+        if: steps.job-status.outputs.job-status == 'success'
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+

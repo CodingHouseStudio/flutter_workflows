@@ -62,6 +62,12 @@ on:
     secrets:
       ssh_key:
         required: false
+env:
+  GITHUB_OUTPUT: ${{github.workspace}}/.github/workflows/output.txt
+  FLUTTER_VERSION: 3.13.9
+permissions:
+  id-token: write   # This is required for requesting the JWT
+  contents: write    # This is required for actions/checkout
 
 jobs:
   build:
@@ -115,3 +121,51 @@ jobs:
           path: ${{inputs.working_directory}}/coverage/lcov.info
           exclude: ${{inputs.coverage_excludes}}
           min_coverage: ${{inputs.min_coverage}}
+  integration-android:
+    needs: build  # Make the integration job dependent on the build job
+    runs-on: buildjet-2vcpu-ubuntu-2204
+    strategy:
+      matrix:
+        api-level: [ 29 ]
+        target: [ default ]
+        arch: [ x86_64 ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set Flutter cache variables
+        shell: bash
+        id: set_flutter_cache_vars
+        run: |
+          echo "cache_key=flutter-${{runner.os}}-stable-${{env.FLUTTER_VERSION}}-${{runner.arch}}" >> $GITHUB_OUTPUT
+          cache_path="${{runner.tool_cache}}/flutter/stable-${{env.FLUTTER_VERSION}}-${{runner.arch}}"
+          echo "cache_path=$(echo ${cache_path} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+      - name: Cache Flutter
+        uses: buildjet/cache@v3
+        with:
+          path: ${{steps.set_flutter_cache_vars.outputs.cache_path}}
+          key: ${{steps.set_flutter_cache_vars.outputs.cache_key}}-${{hashFiles('**/pubspec.lock')}}
+          restore-keys: |
+            ${{steps.set_flutter_cache_vars.outputs.cache_key}}
+      - name: Flutter action
+        uses: subosito/flutter-action@v2.12.0
+        with:
+          channel: stable
+          flutter-version: ${{env.FLUTTER_VERSION}}
+      - name: Flutter Pub Get # get flutter packages information
+        run: flutter pub get
+      - name: Flutter code generation # generate any missing code from source code
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+      - name: Android Emulator Runner
+        uses: ReactiveCircus/android-emulator-runner@v2.28.0
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: ${{ matrix.target }}
+          arch: ${{ matrix.arch }}
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          force-avd-creation: false
+          script: flutter test integration_test --flavor development --verbose
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: e2e_output
+          path: e2e_output.log

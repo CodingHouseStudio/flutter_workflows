@@ -117,8 +117,8 @@ jobs:
       - build
       - integration-web
     timeout-minutes: 15
-    runs-on: ${{inputs.runs_on}}
-#    runs-on: buildjet-2vcpu-ubuntu-2204
+#    runs-on: ${{inputs.runs_on}}
+    runs-on: buildjet-2vcpu-ubuntu-2204
     strategy:
       matrix:
         api-level: [ 29 ]

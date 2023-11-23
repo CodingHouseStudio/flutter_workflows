@@ -205,14 +205,13 @@ jobs:
       - name: Notify Slack on Success
         if: steps.job-status.outputs.job-status == 'success'
         uses: rtCamp/action-slack-notify@v2
-
-        with:
-          slack_webhook: https://hooks.slack.com/services/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
-          slack_message: "Build successful for ${{ github.repository }} on branch ${{ github.ref }}. Check ${{ github.event_name }} ${{ github.event.workflow_run.event }} for more details."
+        env:
+          SLACK_WEBHOOK: https://hooks.slack.com/services/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
+          SLACK_MESSAGE: "Build successful for ${{ github.repository }} on branch ${{ github.ref }}. Check ${{ github.event_name }} ${{ github.event.workflow_run.event }} for more details."
 
       - name: Notify Slack on Failure
         if: steps.job-status.outputs.job-status == 'failure'
         uses: rtCamp/action-slack-notify@v2
-        with:
-          slack_webhook: https://hooks.slack.com/services/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
-          slack_message: "Build failed for ${{ github.repository }} on branch ${{ github.ref }}. Check ${{ github.event_name }} ${{ github.event.workflow_run.event }} for more details."
+        env:
+          SLACK_WEBHOOK: https://hooks.slack.com/services/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
+          SLACK_MESSAGE: "Build failed for ${{ github.repository }} on branch ${{ github.ref }}. Check ${{ github.event_name }} ${{ github.event.workflow_run.event }} for more details."

@@ -191,8 +191,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - build
-      - integration-android
-      - integration-web
+
     steps:
       - name: Determine Job Status
         id: job-status
@@ -208,16 +207,12 @@ jobs:
         uses: rtCamp/action-slack-notify@v2
 
         with:
-          SLACK_WEBHOOK: REDACTED
-        env:
-          SLACK_WEBHOOK: '${{ secrets.SLACK_WEBHOOK }}'
-          SLACK_MESSAGE: "Build successful for ${{ github.repository }} on branch ${{ github.ref }}. Check ${{ github.event_name }} ${{ github.event.workflow_run.event }} for more details."
+          slack_webhook: REDACTED
+          slack_message: "Build successful for ${{ github.repository }} on branch ${{ github.ref }}. Check ${{ github.event_name }} ${{ github.event.workflow_run.event }} for more details."
 
       - name: Notify Slack on Failure
         if: steps.job-status.outputs.job-status == 'failure'
         uses: rtCamp/action-slack-notify@v2
         with:
-          SLACK_WEBHOOK: REDACTED
-        env:
-          SLACK_WEBHOOK: '${{ secrets.SLACK_WEBHOOK }}'
-          SLACK_MESSAGE: "Build failed for ${{ github.repository }} on branch ${{ github.ref }}. Check ${{ github.event_name }} ${{ github.event.workflow_run.event }} for more details."
+          slack_webhook: REDACTED
+          slack_message: "Build failed for ${{ github.repository }} on branch ${{ github.ref }}. Check ${{ github.event_name }} ${{ github.event.workflow_run.event }} for more details."

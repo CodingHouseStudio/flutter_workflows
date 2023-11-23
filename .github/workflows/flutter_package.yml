@@ -208,15 +208,18 @@ jobs:
       - name: Notify Slack on Success
         if: steps.job-status.outputs.job-status == 'success'
         uses: rtCamp/action-slack-notify@v2
+
+        with:
+          SLACK_WEBHOOK: '${{ secrets.SLACK_WEBHOOK }}'
         env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK: '${{ secrets.SLACK_WEBHOOK }}'
           SLACK_MESSAGE: "Build successful for ${{ github.repository }} on branch ${{ github.ref }}. Check ${{ github.event_name }} ${{ github.event.workflow_run.event }} for more details."
 
       - name: Notify Slack on Failure
         if: steps.job-status.outputs.job-status == 'failure'
         uses: rtCamp/action-slack-notify@v2
         with:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK: '${{ secrets.SLACK_WEBHOOK }}'
         env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK: '${{ secrets.SLACK_WEBHOOK }}'
           SLACK_MESSAGE: "Build failed for ${{ github.repository }} on branch ${{ github.ref }}. Check ${{ github.event_name }} ${{ github.event.workflow_run.event }} for more details."

@@ -153,7 +153,7 @@ jobs:
           name: e2e_output
           path: e2e_output.log
   integration-web:
-    timeout-minutes: 5
+    timeout-minutes: 15
     needs:
       - build
     runs-on: ubuntu-latest

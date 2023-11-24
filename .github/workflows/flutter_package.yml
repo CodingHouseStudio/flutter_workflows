@@ -78,6 +78,8 @@ jobs:
         working-directory: ${{inputs.working_directory}}
     runs-on: ${{inputs.runs_on}}
     steps:
+      - uses: dcarbone/install-jq-action@v2.1.0
+
       - uses: actions/checkout@v4.1.1
       - uses: subosito/flutter-action@v2.12.0
         with:
@@ -125,6 +127,7 @@ jobs:
         target: [ default ]
         arch: [ x86_64 ]
     steps:
+      - uses: dcarbone/install-jq-action@v2.1.0
       - uses: actions/checkout@v4.1.1
       - uses: subosito/flutter-action@v2.12.0
         with:
@@ -159,6 +162,7 @@ jobs:
       - build
     runs-on: ${{inputs.runs_on}}
     steps:
+      - uses: dcarbone/install-jq-action@v2.1.0
       - uses: actions/checkout@v4.1.1
       - uses: subosito/flutter-action@v2.12.0
         with:
@@ -196,6 +200,7 @@ jobs:
       - integration-web
 
     steps:
+      - uses: dcarbone/install-jq-action@v2.1.0
       - name: Determine Job Status
         id: job-status
         run: |

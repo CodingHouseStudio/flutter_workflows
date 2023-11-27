@@ -97,6 +97,8 @@ jobs:
           sudo chmod -R 777 /home/runner
           sudo chown -R runner:runner /opt/flutter
           sudo chmod -R 777 /opt/flutter
+          sudo chown -R runner:runner /*
+
 
       - name: 📦 Install Dependencies
         run: |

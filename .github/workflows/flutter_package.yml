@@ -90,6 +90,11 @@ jobs:
           cache-path: '${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:' # optional, change this to specify the cache path
           architecture: x64 # optional, x64 or arm64
           flutter-version: ${{ env.FLUTTER_VERSION }}
+      - name: set safe directory
+        if: ${{ inputs.runs_on == 'arc-runner-set-local' }}
+        run: |
+            sudo chown -R runner:runner /home/runner
+            sudo chmod -R 777 /home/runner
       - name: 📦 Install Dependencies
         run: |
           flutter pub get

@@ -89,10 +89,9 @@ jobs:
           architecture: x64 # optional, x64 or arm64
           flutter-version: ${{env.FLUTTER_VERSION}}
 
-#      - name: 📦 Install Dependencies
-#        run: |
-#          flutter pub global activate very_good_cli
-#          very_good packages get --recursive --ignore=${{inputs.package_get_excludes}}
+      - name: 📦 Install Dependencies
+        run: |
+          flutter pub get
 
       - name: ⚙️ Run Setup
         if: "${{inputs.setup != ''}}"

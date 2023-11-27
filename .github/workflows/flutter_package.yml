@@ -93,11 +93,11 @@ jobs:
       - name: Set safe directory
         if: ${{ inputs.runs_on == 'arc-runner-set-local' }}
         run: |
-          sudo chown -R runner:runner /home/runner
-          sudo chmod -R 777 /home/runner
-          sudo chown -R runner:runner /opt/flutter
-          sudo chmod -R 777 /opt/flutter
-          sudo chown -R runner:runner /*
+          sudo chown -R runner:runner /home/runner || true
+          sudo chmod -R 777 /home/runner || true
+          sudo chown -R runner:runner /opt/flutter || true
+          sudo chmod -R 777 /opt/flutter || true
+          sudo chown -R runner:runner / || true
 
 
       - name: 📦 Install Dependencies

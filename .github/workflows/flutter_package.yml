@@ -117,7 +117,9 @@ jobs:
   integration-android:
     needs:
       - build
-      - integration-web
+      - integration-web-chrome
+      - integration-web-edge
+      - integration-web-macos
     timeout-minutes: 15
 #    runs-on: ${{inputs.runs_on}}
     runs-on: buildjet-2vcpu-ubuntu-2204
@@ -244,13 +246,15 @@ jobs:
     needs:
       - build
       - integration-android
-      - integration-web
+      - integration-web-chrome
+      - integration-web-edge
+      - integration-web-macos
 
     steps:
       - name: Determine Job Status
         id: job-status
         run: |
-          if ${{ needs.build.result == 'success' && (needs.integration-android.result == 'success' || needs.integration-android.result == 'skipped') && (needs.integration-web.result == 'success' || needs.integration-web.result == 'skipped') }}; then
+          if ${{ needs.build.result == 'success' && (needs.integration-android.result == 'success' || needs.integration-android.result == 'skipped') && (needs.integration-web-chrome.result == 'success' || needs.integration-web-chrome.result == 'skipped') }}; then
             echo "::set-output name=job-status::success"
           else
             echo "::set-output name=job-status::failure"

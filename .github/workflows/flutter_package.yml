@@ -6,7 +6,7 @@ on:
       analyze_directories:
         required: false
         type: string
-        default: "lib test"
+        default: "lib test integration_test"
       concurrency:
         required: false
         type: number
@@ -26,7 +26,7 @@ on:
       format_directories:
         required: false
         type: string
-        default: "lib test"
+        default: "lib test integration_test"
       format_line_length:
         required: false
         type: string

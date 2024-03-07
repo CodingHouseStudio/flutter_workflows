@@ -90,7 +90,8 @@ jobs:
       - name: 📦 Install Dependencies
         run: |
           flutter pub get
-
+      - run: |
+          flutter pub run build_runner build --delete-conflicting-outputs
 
       - name: ⚙️ Run Setup
         if: "${{inputs.setup != ''}}"
@@ -169,6 +170,8 @@ jobs:
           flutter-version: ${{inputs.flutter_version}}
       - name: Flutter Pub Get # get flutter packages information
         run: flutter pub get
+      - run: |
+          flutter pub run build_runner build --delete-conflicting-outputs
       - name: Check Chrome Version
         id: chrome-version
         run: |

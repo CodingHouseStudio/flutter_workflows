@@ -22,7 +22,7 @@ on:
       flutter_version:
         required: false
         type: string
-        default: ""
+        default: "3.19.1"
       format_directories:
         required: false
         type: string

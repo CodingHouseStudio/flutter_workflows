@@ -79,16 +79,14 @@ jobs:
     steps:
 
       - uses: actions/checkout@v4.1.1
-      - name: Set up Flutter
-        if: ${{ inputs.runs_on != 'arc-runner-set-local' }}
-        uses: subosito/flutter-action@v2.12.0
+      - uses: subosito/flutter-action@v2.12.0
         with:
           channel: 'stable'
           cache: true
           cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:' # optional, change this to force refresh cache
           cache-path: '${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:' # optional, change this to specify the cache path
           architecture: x64 # optional, x64 or arm64
-          flutter-version: ${{ inputs.flutter_version }}
+          flutter-version: ${{inputs.flutter_version}}
       - name: 📦 Install Dependencies
         run: |
           flutter pub get

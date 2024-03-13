@@ -270,7 +270,7 @@ jobs:
                 }
               ]
             }
-          SLACK_COLOR: green
+          SLACK_COLOR: ${{ job.status }}
 
       - name: Notify Slack on Failure
         if: steps.job-status.outputs.job-status == 'failure'
@@ -287,4 +287,4 @@ jobs:
                 }
               ]
             }
-          SLACK_COLOR: red
+          SLACK_COLOR: ${{ job.status }}

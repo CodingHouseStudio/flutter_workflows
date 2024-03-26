@@ -112,7 +112,61 @@ jobs:
           path: ${{inputs.working_directory}}/coverage/lcov.info
           exclude: ${{inputs.coverage_excludes}}
           min_coverage: ${{inputs.min_coverage}}
-#  integration-android:
+  build_coverage:
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: ${{inputs.working_directory}}
+    runs-on: ${{inputs.runs_on}}
+    steps:
+
+      - uses: actions/checkout@v4.1.1
+      - uses: subosito/flutter-action@v2.12.0
+        with:
+          channel: 'stable'
+          cache: true
+          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:' # optional, change this to force refresh cache
+          cache-path: '${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:' # optional, change this to specify the cache path
+          architecture: x64 # optional, x64 or arm64
+          flutter-version: ${{inputs.flutter_version}}
+      - name: 📦 Install Dependencies
+        run: |
+          flutter pub get
+      - run: |
+          flutter pub run build_runner build --delete-conflicting-outputs
+
+      - name: ⚙️ Run Setup
+        if: "${{inputs.setup != ''}}"
+        run: ${{inputs.setup}}
+
+      - name: ✨ Check Formatting
+        run: dart format --line-length ${{inputs.format_line_length}} --set-exit-if-changed ${{inputs.format_directories}}
+
+      - name: 🕵️ Analyze
+        run: flutter analyze ${{inputs.analyze_directories}}
+
+      - name: 🧪 Run Tests and Generate Coverage Report
+        run: |
+          flutter test --coverage -j ${{inputs.concurrency}} --test-randomize-ordering-seed random
+          lcov --capture --directory . --output-file coverage/lcov.info
+          genhtml coverage/lcov.info --output-directory coverage/html
+          flutter pub global activate coverage
+          flutter pub global run coverage:format_coverage --lcov --in=coverage/lcov.info --out=coverage/coverage.xml --packages=.packages --report-on=lib
+
+      - name: Install diff-cover
+        run: pip install diff-cover
+
+      - name: 📊 Check Code Coverage for Changed Code
+        run: diff-cover --compare-branch=${{ github.base_ref }} coverage/coverage.xml --fail-under=80
+
+      - name: 📊 Check Code Coverage
+        uses: VeryGoodOpenSource/very_good_coverage@v2
+        with:
+          path: ${{inputs.working_directory}}/coverage/lcov.info
+          exclude: ${{inputs.coverage_excludes}}
+          min_coverage: ${{inputs.min_coverage}}
+
+  #  integration-android:
 #    needs:
 #      - build
 #      - integration-web-chrome

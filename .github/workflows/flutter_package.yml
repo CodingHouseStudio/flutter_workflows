@@ -150,6 +150,7 @@ jobs:
         run: |
           flutter test --coverage -j ${{inputs.concurrency}} --test-randomize-ordering-seed random
           lcov --capture --directory . --output-file coverage/lcov.info
+          lcov --remove coverage/lcov.info 'lib/l10n/*' 'lib/firebase_options_development.dart' 'lib/bootstrap.dart' 'lib/shared/helper/get_it_service_locator.dart' 'lib/shared/constants/*' 'lib/shared/constants/variables_constant.dart' '*.g.dart' '*.freezed.dart' 'lib/shared/navigation/*' -o coverage/lcov.info
           genhtml coverage/lcov.info --output-directory coverage/html
           flutter pub global activate coverage
           flutter pub global run coverage:format_coverage --lcov --in=coverage/lcov.info --out=coverage/coverage.xml --packages=.packages --report-on=lib

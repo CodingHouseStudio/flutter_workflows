@@ -302,7 +302,8 @@ jobs:
     steps:
       - name: Determine Job Status
         id: job-status
-        run: |# && (needs.integration-web-chrome.result == 'success' || needs.integration-web-chrome.result == 'skipped')
+        run:
+          | # && (needs.integration-web-chrome.result == 'success' || needs.integration-web-chrome.result == 'skipped')
           if ${{ needs.build.result == 'success'  }}; then 
             echo "::set-output name=job-status::success"
           else

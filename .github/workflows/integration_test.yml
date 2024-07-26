@@ -6,7 +6,7 @@ on:
       analyze_directories:
         required: false
         type: string
-        default: "lib test integration_test"
+        default: "integration_test"
       concurrency:
         required: false
         type: number

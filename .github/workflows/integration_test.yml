@@ -1,4 +1,4 @@
-name: Flutter Package Workflow
+name: Integration Test Workflow
 
 on:
   workflow_call:

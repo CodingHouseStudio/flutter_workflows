@@ -102,6 +102,9 @@ jobs:
       - name: 🕵️ Analyze
         run: flutter analyze ${{inputs.analyze_directories}}
 
+      - name: 🛠️ Install very_good_cli
+        run: dart pub global activate very_good_cli
+
       - name: 🧪 Run Tests
         run: very_good test --coverage --concurrency ${{inputs.concurrency}} --test-randomize-ordering-seed random
 

@@ -103,7 +103,7 @@ jobs:
         run: flutter analyze ${{inputs.analyze_directories}}
 
       - name: 🧪 Run Tests
-        run: flutter test --coverage -j ${{inputs.concurrency}} --test-randomize-ordering-seed random
+        run: very_good test --coverage -concurrency ${{inputs.concurrency}} --test-randomize-ordering-seed random
 
       - name: 📊 Check Code Coverage
         uses: VeryGoodOpenSource/very_good_coverage@v2

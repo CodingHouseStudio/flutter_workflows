@@ -15,7 +15,7 @@ on:
         required: false
         type: string
         default: |
-          lib/firebase_options_development.dart 
+          "lib/firebase_options_development.dart 
           lib/l10n/l10n.dart 
           lib/bootstrap.dart 
           lib/shared/helper/get_it_service_locator.dart 
@@ -47,7 +47,7 @@ on:
           lib/shared/constants/extension/extension_constants.dart 
           lib/shared/constants/extension/list_extension.dart 
           lib/shared/models/failure_model/exceptions.dart 
-          lib/shared/widget/info_version_widget.dart
+          lib/shared/widget/info_version_widget.dart"
       flutter_channel:
         required: false
         type: string

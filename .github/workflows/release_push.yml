@@ -88,7 +88,7 @@ jobs:
       #   run: |
       #     dart run sentry_dart_plugin
       - name: 📡 Run Sentry Dart Plugin
-        if: inputs.run_sentry_plugin == 'true'
+        if: ${{inputs.run_sentry_plugin}}
         run: flutter packages pub run sentry_dart_plugin
       # - name: Configure AWS Credentials Action for GitHub Actions
       #   uses: aws-actions/configure-aws-credentials@v4.0.1

@@ -112,13 +112,29 @@ jobs:
       
       - name: Set Build Flags
         id: set_flags
-        run: echo "WEB_RENDERER_FLAGS=$(if [ ${{ inputs.web_renderer }} == 'canvaskit' ]; then echo ' --enable-canvaskit'; fi)" >> $GITHUB_ENV
-
-      - name: Build the Web static pages # generate deployment files
         run: |
-          flutter build web --release -t lib/main_${{inputs.FLAVOUR}}.dart --wasm --build-name=1.0.2 --build-number=${{inputs.build_number}} --dart-define=FLAVOUR=${{inputs.FLAVOUR}} --source-maps${{ env.WEB_RENDERER_FLAGS }} --web-renderer ${{ inputs.web_renderer }}
+          if [ "${{ inputs.web_renderer }}" == "canvaskit" ]; then
+            echo "WEB_RENDERER_FLAGS=--enable-canvaskit" >> $GITHUB_ENV
+            echo "WEB_RENDERER_OPTION=" >> $GITHUB_ENV
+          elif [ "${{ inputs.web_renderer }}" == "html" ]; then
+            echo "WEB_RENDERER_FLAGS=" >> $GITHUB_ENV
+            echo "WEB_RENDERER_OPTION=--web-renderer=${{ inputs.web_renderer }}" >> $GITHUB_ENV
+          else
+            echo "WEB_RENDERER_FLAGS=" >> $GITHUB_ENV
+            echo "WEB_RENDERER_OPTION=" >> $GITHUB_ENV
+          fi
+
+          if [ "${{ inputs.web_renderer }}" == "wasm" ]; then
+            echo "BUILD_MODE_OPTION=--wasm" >> $GITHUB_ENV
+          else
+            echo "BUILD_MODE_OPTION=" >> $GITHUB_ENV
+          fi
+
+      - name: Build the Web static pages
+        run: |
+          flutter build web --release -t lib/main_${{inputs.FLAVOUR}}.dart ${{ env.BUILD_MODE_OPTION }} --build-name=1.0.2 --build-number=${{inputs.build_number}} --dart-define=FLAVOUR=${{inputs.FLAVOUR}} --source-maps ${{ env.WEB_RENDERER_FLAGS }} ${{ env.WEB_RENDERER_OPTION }}
           mv build/web/flutter_bootstrap.js build/web/${{inputs.build_number}}.flutter_bootstrap.js
-          sed "s/flutter_bootstrap.js/${{inputs.build_number}}.flutter_bootstrap.js/g" build/web/index.html >build/web/newindex.html
+          sed "s/flutter_bootstrap.js/${{inputs.build_number}}.flutter_bootstrap.js/g" build/web/index.html > build/web/newindex.html
           mv build/web/newindex.html build/web/index.html
       - name: 📡 Run Sentry Dart Plugin
         if: ${{inputs.run_sentry_plugin}}

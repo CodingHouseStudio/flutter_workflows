@@ -20,7 +20,7 @@ on:
       web_renderer:
         required: false
         type: string
-        default: "html"  # Default to HTML renderer
+        default: "canvaskit"  # Default to HTML renderer
 
 permissions:
   id-token: write # This is required for requesting the JWT

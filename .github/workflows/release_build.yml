@@ -111,7 +111,7 @@ jobs:
       #   run: flutter pub get
       - name: Build the Web static pages # generate deployment files
         run: |
-          flutter build web --release -t lib/main_${{inputs.FLAVOUR}}.dart --wasm --build-name=1.0.2 --build-number=${{inputs.build_number}} --dart-define=FLAVOUR=${{inputs.FLAVOUR}} --source-maps ${{-if inputs.web_renderer=="canvaskit" }}--enable-canvaskit{{/if}} --web-renderer ${{ inputs.web_renderer }}
+          flutter build web --release -t lib/main_${{inputs.FLAVOUR}}.dart --wasm --build-name=1.0.2 --build-number=${{inputs.build_number}} --dart-define=FLAVOUR=${{inputs.FLAVOUR}} --source-maps ${{ if inputs.web_renderer == "canvaskit" }}--enable-canvaskit{{/if}} --web-renderer ${{ inputs.web_renderer }}
           mv build/web/flutter_bootstrap.js build/web/${{inputs.build_number}}.flutter_bootstrap.js
           sed "s/flutter_bootstrap.js/${{inputs.build_number}}.flutter_bootstrap.js/g" build/web/index.html >build/web/newindex.html
           mv build/web/newindex.html build/web/index.html

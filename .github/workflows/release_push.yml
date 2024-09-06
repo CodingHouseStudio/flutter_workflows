@@ -21,10 +21,6 @@ on:
         required: false
         type: string
         default: "./build/web"
-      run_sentry_plugin:
-        required: true
-        type: boolean
-        default: true
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -87,9 +83,11 @@ jobs:
       # - name: Upload source maps
       #   run: |
       #     dart run sentry_dart_plugin
-      - name: 📡 Run Sentry Dart Plugin
-        if: ${{inputs.run_sentry_plugin}}
-        run: flutter packages pub run sentry_dart_plugin
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: web-build-artifacts
+          path: ./build/web
       # - name: Configure AWS Credentials Action for GitHub Actions
       #   uses: aws-actions/configure-aws-credentials@v4.0.1
       #   with:

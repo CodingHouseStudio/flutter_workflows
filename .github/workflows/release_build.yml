@@ -13,6 +13,10 @@ on:
         required: false
         type: string
         default: "$(date +%s)"
+      run_sentry_plugin:
+        required: true
+        type: boolean
+        default: true
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -107,6 +111,14 @@ jobs:
           mv build/web/flutter_bootstrap.js build/web/${{inputs.build_number}}.flutter_bootstrap.js
           sed "s/flutter_bootstrap.js/${{inputs.build_number}}.flutter_bootstrap.js/g" build/web/index.html >build/web/newindex.html
           mv build/web/newindex.html build/web/index.html
+      - name: 📡 Run Sentry Dart Plugin
+        if: ${{inputs.run_sentry_plugin}}
+        run: flutter packages pub run sentry_dart_plugin
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: web-build-artifacts
+          path: ./build/web
 #  android-build:
 #    runs-on: ubuntu-latest
 #    timeout-minutes: 30

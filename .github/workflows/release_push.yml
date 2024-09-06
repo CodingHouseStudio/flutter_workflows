@@ -22,9 +22,9 @@ on:
         type: string
         default: "./build/web"
       run_sentry_plugin:
-        required: false
+        required: true
         type: boolean
-        default: false
+        default: true
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -77,7 +77,7 @@ jobs:
   #          TEMP_KEYCHAIN_PASSWORD: '${{ secrets.TEMP_KEYCHAIN_PASSWORD }}'
   #          GIT_AUTHORIZATION: '${{ secrets.GIT_AUTHORIZATION }}'
   #          MATCH_PASSWORD: '${{ secrets.MATCH_PASSWORD }}'
-  web_build:
+  web_push:
     runs-on: ubuntu-latest # We are using ubuntu to deploy flutter web
     timeout-minutes: 20
     permissions: # set permissions for AWS creentials specifically

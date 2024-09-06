@@ -68,6 +68,7 @@ jobs:
   web_build:
     runs-on: ubuntu-latest # We are using ubuntu to deploy flutter web
     timeout-minutes: 20
+    environment: ${{inputs.FLAVOUR}}
     permissions: # set permissions for AWS creentials specifically
       id-token: write
       contents: read

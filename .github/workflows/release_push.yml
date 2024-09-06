@@ -109,10 +109,10 @@ jobs:
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
-          apiToken: ${{input.api_token}}
-          accountId: ${{input.account_id}}
-          projectName: ${{input.project_name}}
-          directory: ${{input.directory}}
+          apiToken: ${{inputs.api_token}}
+          accountId: ${{inputs.account_id}}
+          projectName: ${{inputs.project_name}}
+          directory: ${{inputs.directory}}
 #  android-build:
 #    runs-on: ubuntu-latest
 #    timeout-minutes: 30

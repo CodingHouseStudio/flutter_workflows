@@ -25,35 +25,40 @@ env:
   SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
 jobs:
-  cloudflare_deployments_cleaner:
+  clean_cloudflare_deployments:
     timeout-minutes: 15
     runs-on: ${{inputs.runs_on}}
     steps:
-      - name: Remove all deployments except the current one
+      - name: Remove all deployments except active ones
         env:
           CLOUDFLARE_API_TOKEN: ${{inputs.api_token}}
           CLOUDFLARE_ACCOUNT_ID: ${{inputs.account_id}}
           CLOUDFLARE_PROJECT_NAME: ${{inputs.project_name}}
         run: |
-          # Get all deployments
-          all_deployments=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT_NAME/deployments" \
+          echo "Fetching all deployments from Cloudflare API..."
+          # Fetch all deployments from Cloudflare API
+          deployments_response=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT_NAME/deployments" \
             -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN")
           
-          echo "All deployment: $all_deployments"
+          echo "All deployments retrieved."
 
-          # Get the active deployment ID
-          active_deployment_id=$(echo "$all_deployments" | jq -r '.result[] | select(.status == "succeeded") | .id')
-          
-          echo "Active deployment ID: $active_deployment_id"
+          # Extract IDs of active deployments
+          echo "Extracting active deployment IDs..."
+          active_deployment_ids=$(echo "$deployments_response" | jq -r '.result[] | select(.aliases != null) | .id')
 
-          # Loop through deployments and delete all except the active one
-          # for deployment_id in $(echo "$all_deployments" | jq -r '.result[].id'); do
-          #   if [ "$deployment_id" != "$active_deployment_id" ]; then
-          #     echo "Deleting deployment ID: $deployment_id"
-          #     response=$(curl -s -X DELETE "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT_NAME/deployments/$deployment_id" \
-          #       -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN")
-          #     echo "$response"
-          #   else
-          #     echo "Skipping active deployment ID: $deployment_id"
-          #   fi
-          # done
+          echo "Active deployment IDs: $active_deployment_ids"
+
+          # Loop through each deployment and delete inactive ones
+          echo "Starting cleanup of inactive deployments..."
+          for deployment_id in $(echo "$deployments_response" | jq -r '.result[].id'); do
+            if echo "$active_deployment_ids" | grep -q "$deployment_id"; then
+              echo "Skipping active deployment ID: $deployment_id"
+            else
+              echo "Deleting inactive deployment ID: $deployment_id"
+              deletion_response=$(curl -s -X DELETE "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT_NAME/deployments/$deployment_id" \
+                -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN")
+              echo "Deletion response: $deletion_response"
+            fi
+          done
+
+          echo "Cleanup process completed."

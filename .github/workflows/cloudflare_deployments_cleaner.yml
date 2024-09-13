@@ -23,9 +23,6 @@ on:
 env:
   GITHUB_OUTPUT: ${{github.workspace}}/.github/workflows/output.txt
   SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-# permissions:
-  # id-token: write # This is required for requesting the JWT
-  # contents: read # This is required for actions/checkout
 
 jobs:
   cloudflare_deployments_cleaner:
@@ -53,7 +50,10 @@ jobs:
           for deployment_id in $(echo "$all_deployments" | jq -r '.result[].id'); do
             if [ "$deployment_id" != "$active_deployment_id" ]; then
               echo "Deleting deployment ID: $deployment_id"
-              curl -s -X DELETE "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT_NAME/deployments/$deployment_id" \
-                -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN"
+              response=$(curl -s -X DELETE "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT_NAME/deployments/$deployment_id" \
+                -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN")
+              echo "$response"
+            else
+              echo "Skipping active deployment ID: $deployment_id"
             fi
           done

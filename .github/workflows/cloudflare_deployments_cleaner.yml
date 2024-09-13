@@ -47,13 +47,13 @@ jobs:
           echo "Active deployment ID: $active_deployment_id"
 
           # Loop through deployments and delete all except the active one
-          for deployment_id in $(echo "$all_deployments" | jq -r '.result[].id'); do
-            if [ "$deployment_id" != "$active_deployment_id" ]; then
-              echo "Deleting deployment ID: $deployment_id"
-              response=$(curl -s -X DELETE "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT_NAME/deployments/$deployment_id" \
-                -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN")
-              echo "$response"
-            else
-              echo "Skipping active deployment ID: $deployment_id"
-            fi
-          done
+          # for deployment_id in $(echo "$all_deployments" | jq -r '.result[].id'); do
+          #   if [ "$deployment_id" != "$active_deployment_id" ]; then
+          #     echo "Deleting deployment ID: $deployment_id"
+          #     response=$(curl -s -X DELETE "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT_NAME/deployments/$deployment_id" \
+          #       -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN")
+          #     echo "$response"
+          #   else
+          #     echo "Skipping active deployment ID: $deployment_id"
+          #   fi
+          # done

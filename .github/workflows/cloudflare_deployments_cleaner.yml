@@ -35,16 +35,16 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{inputs.account_id}}
           CLOUDFLARE_PROJECT_NAME: ${{inputs.project_name}}
         run: |
-          # Get the active deployment ID
-          active_deployment_id=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT_NAME/deployments" \
-            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            | jq -r '.result[] | sort_by(.created_on)[-1].id')
-          
-          echo "Active deployment ID: $active_deployment_id"
-
           # Get all deployments
           all_deployments=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT_NAME/deployments" \
             -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN")
+          
+          echo "All deployment: $all_deployments"
+
+          # Get the active deployment ID
+          active_deployment_id=$(echo "$all_deployments" | jq -r '.result[] | select(.status == "succeeded") | .id')
+          
+          echo "Active deployment ID: $active_deployment_id"
 
           # Loop through deployments and delete all except the active one
           for deployment_id in $(echo "$all_deployments" | jq -r '.result[].id'); do

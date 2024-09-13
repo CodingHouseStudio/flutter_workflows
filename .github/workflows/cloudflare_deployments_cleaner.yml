@@ -1,0 +1,59 @@
+name: Cloudflare Deployments Cleaner
+
+on:
+  workflow_call:
+    inputs:
+      api_token:
+        required: false
+        type: string
+        default: "REDACTED"
+      account_id:
+        required: false
+        type: string
+        default: "REDACTED"
+      project_name:
+        required: true
+        type: string
+        default: "veteran-development"
+      runs_on:
+        required: false
+        type: string
+        default: "ubuntu-latest"
+
+env:
+  GITHUB_OUTPUT: ${{github.workspace}}/.github/workflows/output.txt
+  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+# permissions:
+  # id-token: write # This is required for requesting the JWT
+  # contents: read # This is required for actions/checkout
+
+jobs:
+  cloudflare_deployments_cleaner:
+    timeout-minutes: 15
+    runs-on: ${{inputs.runs_on}}
+    steps:
+      - name: Remove all deployments except the current one
+        env:
+          CLOUDFLARE_API_TOKEN: ${{inputs.api_token}}
+          CLOUDFLARE_ACCOUNT_ID: ${{inputs.account_id}}
+          CLOUDFLARE_PROJECT_NAME: ${{inputs.project_name}}
+        run: |
+          # Get the active deployment ID
+          active_deployment_id=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT_NAME/deployments" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            | jq -r '.result[] | select(.latest_stage.name == "active") | .id')
+          
+          echo "Active deployment ID: $active_deployment_id"
+
+          # Get all deployments
+          all_deployments=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT_NAME/deployments" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN")
+
+          # Loop through deployments and delete all except the active one
+          for deployment_id in $(echo "$all_deployments" | jq -r '.result[].id'); do
+            if [ "$deployment_id" != "$active_deployment_id" ]; then
+              echo "Deleting deployment ID: $deployment_id"
+              curl -s -X DELETE "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT_NAME/deployments/$deployment_id" \
+                -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN"
+            fi
+          done

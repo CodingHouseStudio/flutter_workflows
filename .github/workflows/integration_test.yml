@@ -3,65 +3,18 @@ name: Integration Test Workflow
 on:
   workflow_call:
     inputs:
-      analyze_directories:
-        required: false
-        type: string
-        default: "integration_test"
-      concurrency:
-        required: false
-        type: number
-        default: 4
-      # coverage_excludes:
-      #   required: false
-      #   type: string
-      #   default: "lib/firebase_options_development.dart lib/l10n/l10n.dart lib/bootstrap.dart lib/shared/helper/get_it_service_locator.dart lib/shared/constants/theme_constant.dart lib/shared/constants/variables_constant.dart lib/shared/constants/* *.g.dart *.freezed.dart lib/shared/navigation/* lib/shared/data_provider/* */blocprovider/*.dart lib/shared/widget/card_add_image_widget.dart lib/shared/widget/image_widget.dart lib/shared/widget/user_photo_widget.dart"
-      flutter_channel:
-        required: false
-        type: string
-        default: "stable"
       flutter_version:
         required: false
         type: string
         default: "3.24.0"
-      # format_directories:
-      #   required: false
-      #   type: string
-      #   default: "lib test"
-      # format_line_length:
-      #   required: false
-      #   type: string
-      #   default: "80"
-      # min_coverage:
-      #   required: false
-      #   type: number
-      #   default: 100
+      flutter_channel:
+        required: false
+        type: string
+        default: "stable"
       runs_on:
         required: false
         type: string
         default: "ubuntu-latest"
-      # setup:
-      #   required: false
-      #   type: string
-      #   default: ""
-      test_optimization:
-        required: false
-        type: boolean
-        default: true
-      test_recursion:
-        required: false
-        type: boolean
-        default: false
-      working_directory:
-        required: false
-        type: string
-        default: "."
-      package_get_excludes:
-        required: false
-        type: string
-        default: "!*"
-    secrets:
-      ssh_key:
-        required: false
 env:
   GITHUB_OUTPUT: ${{github.workspace}}/.github/workflows/output.txt
   SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
@@ -175,7 +128,7 @@ jobs:
       - uses: actions/checkout@v4.1.1
       - uses: subosito/flutter-action@v2.12.0
         with:
-          channel: "stable"
+          channel: ${{inputs.flutter_channel}}
           cache: true
           cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:" # optional, change this to force refresh cache
           cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:" # optional, change this to specify the cache path

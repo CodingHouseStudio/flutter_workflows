@@ -38,7 +38,7 @@ jobs:
           # Get the active deployment ID
           active_deployment_id=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT_NAME/deployments" \
             -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            | jq -r '.result[] | select(.primary)[].id')
+            | jq -r '.result[] | sort_by(.created_on)[-1].id')
           
           echo "Active deployment ID: $active_deployment_id"
 

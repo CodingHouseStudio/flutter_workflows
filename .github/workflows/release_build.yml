@@ -108,7 +108,7 @@ jobs:
       - run: |
           echo "Length of the secret: ${#SECRET_TEST} characters."
         env:
-          SECRET_TEST: ${{ ev.sentry_dsn }}
+          SECRET_TEST: ${{ secrets.sentry_dsn }}
 
       - name: Checkout
         uses: actions/checkout@v4.1.5

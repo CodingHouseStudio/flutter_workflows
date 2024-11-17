@@ -105,6 +105,10 @@ jobs:
       id-token: write
       contents: read
     steps:   
+      - run: |
+          echo "Length of the secret: ${#SECRET_TEST} characters."
+        env:
+          SECRET_TEST: ${{ secrets.FIREBASE_APP_CHECK }}
       - name: Stop execution if secrets are missing or empty
         env:
           sentry_dsn: ${{ secrets.SENTRY_DSN }}

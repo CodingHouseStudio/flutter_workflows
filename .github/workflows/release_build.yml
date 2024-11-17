@@ -21,14 +21,6 @@ on:
         required: true
         type: boolean
         default: true
-      api_token:
-        required: false
-        type: string
-        default: ${{ secrets.API_TOKEN }}
-      account_id:
-        required: false
-        type: string
-        default: ${{ secrets.ACCOUNT_ID }}
       project_name:
         required: true
         type: string
@@ -37,14 +29,15 @@ on:
         required: false
         type: string
         default: "./build/web"
-      sentry_auth_token:
-        required: false
-        type: string
-        default: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
       # web_renderer:
       #   required: false
       #   type: string
       #   default: "skwasm"  # Default to HTML renderer
+    secrets:
+      API_TOKEN: ${{ secrets.API_TOKEN }}
+      SENTRY_AUTH_TOKEN : ${{ secrets.SENTRY_AUTH_TOKEN }}
+      ACCOUNT_ID: ${{ secrets.ACCOUNT_ID }}
 
 permissions:
   id-token: write # This is required for requesting the JWT

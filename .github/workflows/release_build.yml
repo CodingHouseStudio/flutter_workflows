@@ -108,16 +108,7 @@ jobs:
       - run: |
           echo "Length of the secret: ${#SECRET_TEST} characters."
         env:
-          SECRET_TEST: ${{ secrets.FIREBASE_APP_CHECK }}
-      - name: Stop execution if secrets are missing or empty
-        env:
-          sentry_dsn: ${{ secrets.SENTRY_DSN }}
-          firebase_app_check: ${{ secrets.FIREBASE_APP_CHECK }}
-          firebase_vapid_key: ${{ secrets.FIREBASE_VAPID_KEY }}
-        if: ${{ env.sentry_dsn != null && env.sentry_dsn != '' && env.firebase_app_check != null && env.firebase_app_check != '' && env.firebase_vapid_key != null && env.firebase_vapid_key != '' }}
-        run: |
-          echo "Required secrets are missing or empty, stopping workflow."
-          exit 1
+          SECRET_TEST: ${{ secrets.SENTRY_DSN }}
 
       - name: Checkout
         uses: actions/checkout@v4.1.5

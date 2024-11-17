@@ -1,0 +1,12 @@
+name: Dart
+
+jobs:
+  build:
+    environment: 'production'
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: |
+          echo "Length of the secret: ${#SECRET_TEST} characters."
+        env:
+          SECRET_TEST: ${{ secrets.SENTRY_DSN }}

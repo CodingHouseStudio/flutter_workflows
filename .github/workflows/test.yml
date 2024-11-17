@@ -2,10 +2,15 @@ name: Test
 
 on:
   workflow_dispatch:
+    inputs:
+      FLAVOUR:
+        required: true
+        type: string
+        default: "production"
 
 jobs:
   build:
-    environment: 'development'
+    environment: ${{inputs.FLAVOUR}}
     runs-on: ubuntu-latest
 
     steps:

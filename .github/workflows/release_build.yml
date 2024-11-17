@@ -136,8 +136,7 @@ jobs:
       #   run: flutter pub get
       
 
-      get_secrets:
-        id: get_secrets
+      - name: Get Secrets
         run: |
           echo "SENTRY_DSN=${{ secrets.SENTRY_DSN }}" >> $GITHUB_ENV
           echo "FIREBASE_APP_CHECK=${{ secrets.FIREBASE_APP_CHECK }}" >> $GITHUB_ENV

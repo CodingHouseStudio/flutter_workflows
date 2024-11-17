@@ -37,6 +37,10 @@ on:
         required: false
         type: string
         default: "./build/web"
+      sentry_auth_token:
+        required: false
+        type: string
+        default: "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"
       # web_renderer:
       #   required: false
       #   type: string
@@ -119,6 +123,7 @@ jobs:
       #     echo "buildNumber=$buildNumber" >> $GITHUB_ENV
       - name: Update pubspec.yaml
         run: |
+          sed -i "s/^auth_token: .*/auth_token: ${{inputs.sentry_auth_token}}/" pubspec.yaml
           sed -i "s/^version: .*/version: 1.0.2+${{inputs.build_number}}/" pubspec.yaml
       - name: 📦 Install Dependencies
         run: flutter config --no-analytics
@@ -132,7 +137,7 @@ jobs:
       
       - name: Build the Web static pages # generate deployment files
         run: |
-          flutter build web --release -t lib/main_${{inputs.FLAVOUR}}.dart --wasm --build-name=1.0.2 --build-number=${{inputs.build_number}} --dart-define=FLAVOUR=${{inputs.FLAVOUR}} --dart-define=ROLE=${{inputs.ROLE}} --source-maps
+          flutter build web --release -t lib/main_${{inputs.FLAVOUR}}.dart --wasm --build-name=1.0.2 --build-number=${{inputs.build_number}} --dart-define=FLAVOUR=${{inputs.FLAVOUR}} --dart-define=ROLE=${{inputs.ROLE}} --dart-define-from-file=.env.json --source-maps
           mv build/web/flutter_bootstrap.js build/web/${{inputs.build_number}}.flutter_bootstrap.js
           sed "s/flutter_bootstrap.js/${{inputs.build_number}}.flutter_bootstrap.js/g" build/web/index.html >build/web/newindex.html
           mv build/web/newindex.html build/web/index.html

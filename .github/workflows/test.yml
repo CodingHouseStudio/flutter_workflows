@@ -18,3 +18,11 @@ jobs:
           echo "Length of the secret: ${#SECRET_TEST} characters."
         env:
           SECRET_TEST: ${{ secrets.SENTRY_DSN }}
+      - run: |
+          echo "Length of the secret: ${#SECRET_TEST} characters."
+        env:
+          SECRET_TEST: ${{ secrets.FIREBASE_APP_CHECK }}
+      - run: |
+          echo "Length of the secret: ${#SECRET_TEST} characters."
+        env:
+          SECRET_TEST: ${{ secrets.FIREBASE_VAPID_KEY }}

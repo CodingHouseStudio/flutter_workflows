@@ -136,7 +136,11 @@ jobs:
       #   run: flutter pub get
           
       - name: Stop execution if secrets are missing
-        if: ${{ secrets.ssh_key == null || secrets.SENTRY_DSN == null || secrets.FIREBASE_APP_CHECK == null || secrets.FIREBASE_VAPID_KEY == null }}
+        env:
+          sentry_dsn: ${{ secrets.SENTRY_DSN }}
+          firebase_app_check: ${{ secrets.FIREBASE_APP_CHECK }}
+          firebase_vapid_key: ${{ secrets.FIREBASE_VAPID_KEY }}
+        if: ${{ env.sentry_dsn != null || env.firebase_app_check != null || env.firebase_vapid_key != null }}
         run: |
           echo "Required secrets are missing, stopping workflow."
           exit 1

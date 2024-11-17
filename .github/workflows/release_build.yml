@@ -24,11 +24,11 @@ on:
       api_token:
         required: false
         type: string
-        default: "REDACTED"
+        default: ${{ secrets.API_TOKEN }}
       account_id:
         required: false
         type: string
-        default: "REDACTED"
+        default: ${{ secrets.ACCOUNT_ID }}
       project_name:
         required: true
         type: string
@@ -40,7 +40,7 @@ on:
       sentry_auth_token:
         required: false
         type: string
-        default: "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"
+        default: ${{ secrets.SENTRY_AUTH_TOKEN }}
       # web_renderer:
       #   required: false
       #   type: string
@@ -108,7 +108,7 @@ jobs:
       - run: |
           echo "Length of the secret: ${#SECRET_TEST} characters."
         env:
-          SECRET_TEST: ${{ secrets.sentry_dsn }}
+          SECRET_TEST: ${{ secrets.SENTRY_DSN }}
 
       - name: Checkout
         uses: actions/checkout@v4.1.5

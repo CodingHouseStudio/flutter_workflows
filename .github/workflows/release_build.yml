@@ -34,10 +34,6 @@ on:
       #   required: false
       #   type: string
       #   default: "skwasm"  # Default to HTML renderer
-    secrets:
-      API_TOKEN: ${{ secrets.API_TOKEN }}
-      SENTRY_AUTH_TOKEN : ${{ secrets.SENTRY_AUTH_TOKEN }}
-      ACCOUNT_ID: ${{ secrets.ACCOUNT_ID }}
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -116,7 +112,7 @@ jobs:
       #     echo "buildNumber=$buildNumber" >> $GITHUB_ENV
       - name: Update pubspec.yaml
         run: |
-          sed -i "s/^auth_token: .*/auth_token: ${{inputs.sentry_auth_token}}/" pubspec.yaml
+          sed -i "s/^auth_token: .*/auth_token: ${{secrets.sentry_auth_token}}/" pubspec.yaml
           sed -i "s/^version: .*/version: 1.0.2+${{inputs.build_number}}/" pubspec.yaml
       - name: 📦 Install Dependencies
         run: flutter config --no-analytics
@@ -144,8 +140,8 @@ jobs:
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
-          apiToken: ${{inputs.api_token}}
-          accountId: ${{inputs.account_id}}
+          apiToken: ${{secrets.API_TOKEN}}
+          accountId: ${{secrets.ACCOUNT_ID}}
           projectName: ${{inputs.project_name}}
           directory: ${{inputs.directory}}
 #  android-build:

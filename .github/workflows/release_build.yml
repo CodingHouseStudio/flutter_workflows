@@ -144,14 +144,15 @@ jobs:
         run: flutter pub run build_runner build --delete-conflicting-outputs
       # - name: Flutter Pub Get # get flutter packages information
       #   run: flutter pub get
-
-      - name: Build the Web static pages # generate deployment files
-        env:
-          sentry_dsn: ${{ secrets.SENTRY_DSN }}
-          firebase_app_check: ${{ secrets.FIREBASE_APP_CHECK }}
-          firebase_vapid_key: ${{ secrets.FIREBASE_VAPID_KEY }}
+      - name: Create .env file from secrets
         run: |
-          flutter build web --release -t lib/main_${{inputs.FLAVOUR}}.dart --wasm --build-name=1.0.2 --build-number=${{inputs.build_number}} --dart-define=FLAVOUR=${{inputs.FLAVOUR}} --dart-define=ROLE=${{inputs.ROLE}} --dart-define=SENTRY_DSN=${{env.sentry_dsn}} --dart-define=FIREBASE_APP_CHECK=${{env.firebase_app_check}} --dart-define=FIREBASE_VAPID_KEY=${{env.firebase_vapid_key}} --source-maps
+          echo "SENTRY_DSN=${{ secrets.SENTRY_DSN }}" > .env
+          echo "FIREBASE_APP_CHECK=${{ secrets.FIREBASE_APP_CHECK }}" >> .env
+          echo "FIREBASE_VAPID_KEY=${{ secrets.FIREBASE_VAPID_KEY }}" >> .env
+          
+      - name: Build the Web static pages # generate deployment files
+        run: |
+          flutter build web --release -t lib/main_${{inputs.FLAVOUR}}.dart --wasm --build-name=1.0.2 --build-number=${{inputs.build_number}} --dart-define=FLAVOUR=${{inputs.FLAVOUR}} --dart-define=ROLE=${{inputs.ROLE}} --dart-define-from-file=.env --source-maps
           mv build/web/flutter_bootstrap.js build/web/${{inputs.build_number}}.flutter_bootstrap.js
           sed "s/flutter_bootstrap.js/${{inputs.build_number}}.flutter_bootstrap.js/g" build/web/index.html >build/web/newindex.html
           mv build/web/newindex.html build/web/index.html

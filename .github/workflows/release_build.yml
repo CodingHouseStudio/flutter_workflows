@@ -104,7 +104,17 @@ jobs:
     permissions: # set permissions for AWS creentials specifically
       id-token: write
       contents: read
-    steps:        
+    steps:   
+      - name: Stop execution if secrets are missing
+        env:
+          sentry_dsn: ${{ secrets.SENTRY_DSN }}
+          firebase_app_check: ${{ secrets.FIREBASE_APP_CHECK }}
+          firebase_vapid_key: ${{ secrets.FIREBASE_VAPID_KEY }}
+        if: ${{ env.sentry_dsn != null || env.firebase_app_check != null || env.firebase_vapid_key != null }}
+        run: |
+          echo "Required secrets are missing, stopping workflow."
+          exit 1 
+
       - name: Checkout
         uses: actions/checkout@v4.1.5
       - uses: subosito/flutter-action@v2.12.0
@@ -134,16 +144,6 @@ jobs:
         run: flutter pub run build_runner build --delete-conflicting-outputs
       # - name: Flutter Pub Get # get flutter packages information
       #   run: flutter pub get
-          
-      - name: Stop execution if secrets are missing
-        env:
-          sentry_dsn: ${{ secrets.SENTRY_DSN }}
-          firebase_app_check: ${{ secrets.FIREBASE_APP_CHECK }}
-          firebase_vapid_key: ${{ secrets.FIREBASE_VAPID_KEY }}
-        if: ${{ env.sentry_dsn != null || env.firebase_app_check != null || env.firebase_vapid_key != null }}
-        run: |
-          echo "Required secrets are missing, stopping workflow."
-          exit 1
 
       - name: Build the Web static pages # generate deployment files
         env:

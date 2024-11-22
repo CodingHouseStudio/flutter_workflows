@@ -121,7 +121,7 @@ jobs:
           if [ -z "$build_number" ]; then
             build_number=$(date +%s) # Use current timestamp if build_number is empty
           fi
-          sed -i "s|^version: .*|version: 1.0.2+${build_number}|; s|^auth_token: .*|auth_token: ${{ env.sentry_auth_token }}|" pubspec.yaml
+          sed -i "s|^version: .*|version: 1.0.2+${build_number}|; s|^auth_token:.*|auth_token: ${{ env.sentry_auth_token }}|" pubspec.yaml
 
           echo "build_number=$build_number" >> $GITHUB_ENV
 

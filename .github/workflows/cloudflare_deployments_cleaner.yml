@@ -28,10 +28,18 @@ jobs:
           CLOUDFLARE_PROJECT_NAME: ${{inputs.project_name}}
         run: |
           echo "Fetching all deployments from Cloudflare API..."
-          # Fetch all deployments from Cloudflare API
           deployments_response=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT_NAME/deployments" \
             -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN")
-          
+
+          # Output the full response for debugging
+          echo "Deployments response: $deployments_response"
+
+          # Check if the response is empty or null
+          if [ -z "$deployments_response" ] || [ "$deployments_response" == "null" ]; then
+            echo "Error: Empty or null response from Cloudflare API"
+            exit 1
+          fi
+
           echo "All deployments retrieved."
 
           # Extract IDs of active deployments
@@ -39,6 +47,7 @@ jobs:
           active_deployment_ids=$(echo "$deployments_response" | jq -r '.result[] | select(.aliases != null) | .id')
 
           echo "Active deployment IDs: $active_deployment_ids"
+
 
           # Loop through each deployment and delete inactive ones
           echo "Starting cleanup of inactive deployments..."

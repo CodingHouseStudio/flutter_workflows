@@ -116,8 +116,8 @@ jobs:
       #     echo "buildNumber=$buildNumber" >> $GITHUB_ENV
       - name: Update pubspec.yaml
         run: |
-          sed -i 's%^auth_token: .*/auth_token: ${{ secrets.sentry_auth_token }}%' pubspec.yaml
-          sed -i 's%^version: .*/version: 1.0.2+${{ inputs.build_number }}%' pubspec.yaml
+          sed -i 's|^version: .*|version: 1.0.2+${{ inputs.build_number }}|' pubspec.yaml
+          sed -i 's|^auth_token: .*|auth_token: ${{ secrets.sentry_auth_token }}|' pubspec.yaml
       - name: 📦 Install Dependencies
         run: flutter config --no-analytics
       - run: flutter config --no-cli-animations

@@ -325,7 +325,7 @@ jobs:
         if: steps.job-status.outputs.job-status == 'success'
         uses: rtCamp/action-slack-notify@v2
         env:
-          SLACK_WEBHOOK: REDACTED
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_MESSAGE: |
             {
               "text": "Build successful for ${{ github.repository }} on branch ${{ github.ref }}. Check ${{ github.event_name }} ${{ github.event.workflow_run.event }} for more details.",

@@ -121,6 +121,8 @@ jobs:
           fi
           sed -i "s|^version: .*|version: 1.0.2+${build_number}|; s|^auth_token: .*|auth_token: ${{ secrets.sentry_auth_token }}|" pubspec.yaml
 
+          echo "build_number=$build_number" >> $GITHUB_ENV
+
       - name: 📦 Install Dependencies
         run: flutter config --no-analytics
       - run: flutter config --no-cli-animations
@@ -137,9 +139,9 @@ jobs:
           firebase_app_check: ${{ secrets.FIREBASE_APP_CHECK }}
           firebase_vapid_key: ${{ secrets.FIREBASE_VAPID_KEY }}
         run: |
-          flutter build web --release -t lib/main_${{inputs.FLAVOUR}}.dart --wasm --build-name=1.0.2 --build-number=${{inputs.build_number}} --dart-define=FLAVOUR=${{inputs.FLAVOUR}} --dart-define=ROLE=${{inputs.ROLE}} --dart-define=SENTRY_DSN=${{env.sentry_dsn}} --dart-define=FIREBASE_APP_CHECK=${{env.firebase_app_check}} --dart-define=FIREBASE_VAPID_KEY=${{env.firebase_vapid_key}} --source-maps
-          mv build/web/flutter_bootstrap.js build/web/${{inputs.build_number}}.flutter_bootstrap.js
-          sed "s/flutter_bootstrap.js/${{inputs.build_number}}.flutter_bootstrap.js/g" build/web/index.html >build/web/newindex.html
+          flutter build web --release -t lib/main_${{inputs.FLAVOUR}}.dart --wasm --build-name=1.0.2 --build-number=${{env.build_number}} --dart-define=FLAVOUR=${{inputs.FLAVOUR}} --dart-define=ROLE=${{inputs.ROLE}} --dart-define=SENTRY_DSN=${{env.sentry_dsn}} --dart-define=FIREBASE_APP_CHECK=${{env.firebase_app_check}} --dart-define=FIREBASE_VAPID_KEY=${{env.firebase_vapid_key}} --source-maps
+          mv build/web/flutter_bootstrap.js build/web/${{env.build_number}}.flutter_bootstrap.js
+          sed "s/flutter_bootstrap.js/${{env.build_number}}.flutter_bootstrap.js/g" build/web/index.html >build/web/newindex.html
           mv build/web/newindex.html build/web/index.html
       - name: 📡 Run Sentry Dart Plugin
         if: ${{inputs.run_sentry_plugin}}

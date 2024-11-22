@@ -17,7 +17,7 @@ on:
         default: "ubuntu-latest"
 env:
   GITHUB_OUTPUT: ${{github.workspace}}/.github/workflows/output.txt
-  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL_VETERANAM }}
 permissions:
   id-token: write # This is required for requesting the JWT
   contents: read # This is required for actions/checkout
@@ -225,7 +225,7 @@ jobs:
         if: steps.job-status.outputs.job-status == 'success'
         uses: rtCamp/action-slack-notify@v2
         env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL_VETERANAM }}
           SLACK_MESSAGE: |
             {
               "text": "Build successful for ${{ github.repository }} on branch ${{ github.ref }}. Check ${{ github.event_name }} ${{ github.event.workflow_run.event }} for more details.",

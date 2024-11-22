@@ -14,7 +14,7 @@ on:
 
 env:
   GITHUB_OUTPUT: ${{github.workspace}}/.github/workflows/output.txt
-  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL_VETERANAM }}
 
 jobs:
   clean_cloudflare_deployments:

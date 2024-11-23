@@ -141,26 +141,34 @@ jobs:
           mv build/web/flutter_bootstrap.js build/web/${{inputs.build_number}}.flutter_bootstrap.js
           sed "s/flutter_bootstrap.js/${{inputs.build_number}}.flutter_bootstrap.js/g" build/web/index.html >build/web/newindex.html
           mv build/web/newindex.html build/web/index.html
-      - name: 📡 Run Sentry Dart Plugin
-        if: ${{ inputs.run_sentry_plugin }}
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      - name: Modify pubspec.yaml and debug
         run: |
-          # Escape special characters in the token to prevent sed issues
-          escaped_token=$(echo "$SENTRY_AUTH_TOKEN" | sed 's/[&/]/\\&/g')
+          # Debug token value (masked by GitHub Actions)
+          echo "Debugging SENTRY_AUTH_TOKEN"
           
-          # Modify pubspec.yaml and export the modified line to a secure temporary file
+          # Escape special characters in the token
+          escaped_token=$(echo "$SENTRY_AUTH_TOKEN" | sed 's/[&/]/\\&/g')
+          echo "Escaped token: [masked]"
+          
+          # Modify pubspec.yaml
           sed -i "s/^auth_token:.*/auth_token: $escaped_token/" pubspec.yaml
+          if [ $? -ne 0 ]; then
+          echo "Error: sed command failed. Check the syntax and file structure."
+          exit 1
+          fi
           
           # Verify the modified line
           grep "^auth_token:" pubspec.yaml > modified_auth_token.txt
+          if [ $? -ne 0 ]; then
+          echo "Error: Modified auth_token line not found in pubspec.yaml."
+          cat pubspec.yaml
+          exit 1
+          fi
           
-          # Securely output the modified content for debugging
+          # Output the modified line securely
           echo "Modified auth_token line:"
           cat modified_auth_token.txt
-          
-          # Run the Sentry Dart Plugin
-          flutter packages pub run sentry_dart_plugin
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:

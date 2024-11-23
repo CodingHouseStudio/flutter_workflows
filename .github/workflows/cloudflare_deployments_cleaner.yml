@@ -11,6 +11,10 @@ on:
         required: false
         type: string
         default: "ubuntu-latest"
+      environment:
+        required: true
+        type: string
+        default: "production"
 
 env:
   GITHUB_OUTPUT: ${{github.workspace}}/.github/workflows/output.txt
@@ -20,6 +24,7 @@ jobs:
   clean_cloudflare_deployments:
     timeout-minutes: 15
     runs-on: ${{inputs.runs_on}}
+    environment: ${{inputs.environment}}
     steps:
       - name: Remove all deployments except active ones
         env:

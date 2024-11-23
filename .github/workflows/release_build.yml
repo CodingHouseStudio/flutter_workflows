@@ -117,7 +117,7 @@ jobs:
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.sentry_auth_token }}
           build_number: ${{ inputs.build_number }}
-        if: ${{ env.SENTRY_AUTH_TOKEN == 'Monday' }}
+        if: ${{ env.SENTRY_AUTH_TOKEN != '' }}
         run: |
           echo "build_number=$build_number" >> $GITHUB_ENV
           # Determine the build number

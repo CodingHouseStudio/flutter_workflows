@@ -149,7 +149,7 @@ jobs:
           # Escape special characters in the token
           escaped_token=$(echo "$SENTRY_AUTH_TOKEN" | sed 's/[&/]/\\&/g')
           echo "Escaped token: [masked]"
-          
+
           # Modify pubspec.yaml
           sed -i.bak "s/^[[:space:]]*auth_token:.*/auth_token: $SENTRY_AUTH_TOKEN/" pubspec.yaml
 

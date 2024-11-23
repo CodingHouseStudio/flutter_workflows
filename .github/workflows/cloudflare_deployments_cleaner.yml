@@ -31,6 +31,12 @@ jobs:
           # Fetch all deployments from Cloudflare API
           deployments_response=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT_NAME/deployments" \
             -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN")
+          if echo "$deployments_response" | jq -e '.success' >/dev/null 2>&1; then
+            echo "API request successful."
+          else
+            echo "API request failed: $(echo "$deployments_response" | jq '.errors')"
+            exit 1
+          fi
           
           echo "All deployments retrieved."
 

@@ -153,6 +153,7 @@ jobs:
           # Modify pubspec.yaml
           sed -i .bak "s/^[[:space:]]*auth_token:.*/auth_token: $SENTRY_AUTH_TOKEN/" pubspec.yaml
 
+
           if [ $? -ne 0 ]; then
           echo "Error: sed command failed. Check the syntax and file structure."
           exit 1

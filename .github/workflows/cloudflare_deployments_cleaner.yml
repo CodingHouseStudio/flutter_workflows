@@ -23,8 +23,8 @@ jobs:
     steps:
       - name: Remove all deployments except active ones
         env:
-          CLOUDFLARE_API_TOKEN: ${{secrets.CLOUDFLARE_API_TOKEN}}
-          CLOUDFLARE_ACCOUNT_ID: ${{secrets.CLOUDFLARE_ACCOUNT_ID}}
+          CLOUDFLARE_API_TOKEN: ${{secrets.API_TOKEN}}
+          CLOUDFLARE_ACCOUNT_ID: ${{secrets.ACCOUNT_ID}}
           CLOUDFLARE_PROJECT_NAME: ${{inputs.project_name}}
         run: |
           echo "Fetching all deployments from Cloudflare API..."

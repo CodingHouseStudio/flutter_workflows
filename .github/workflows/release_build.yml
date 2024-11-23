@@ -129,14 +129,14 @@ jobs:
       - name: Modify pubspec.yaml and debug
         run: |
           # Debug token value (masked by GitHub Actions)
-          echo "Debugging SENTRY_AUTH_TOKEN"
+                   echo "Debugging SENTRY_AUTH_TOKEN"
 
           # Escape special characters in the token
           escaped_token=$(echo "$SENTRY_AUTH_TOKEN" | sed 's/[&/]/\\&/g')
           echo "Escaped token: [masked]"
 
           # Modify pubspec.yaml
-          sed -i.bak "s/^[[:space:]]*auth_token:.*/auth_token:  $SENTRY_AUTH_TOKEN/" pubspec.yaml
+          sed -i.bak "s/^[[:space:]]*auth_token:.*/  auth_token: $SENTRY_AUTH_TOKEN/" pubspec.yaml
 
 
           if [ $? -ne 0 ]; then
@@ -174,21 +174,21 @@ jobs:
       - name: Modify pubspec.yaml and debug
         run: |
           # Debug token value (masked by GitHub Actions)
-          echo "Debugging SENTRY_AUTH_TOKEN"
-          
+                  echo "Debugging SENTRY_AUTH_TOKEN"
+
           # Escape special characters in the token
           escaped_token=$(echo "$SENTRY_AUTH_TOKEN" | sed 's/[&/]/\\&/g')
           echo "Escaped token: [masked]"
 
           # Modify pubspec.yaml
-          sed -i.bak "s/^[[:space:]]*auth_token:.*/auth_token: $SENTRY_AUTH_TOKEN/" pubspec.yaml
+          sed -i.bak "s/^[[:space:]]*auth_token:.*/  auth_token: $SENTRY_AUTH_TOKEN/" pubspec.yaml
 
 
           if [ $? -ne 0 ]; then
           echo "Error: sed command failed. Check the syntax and file structure."
           exit 1
           fi
-          
+
           # Verify the modified line
           grep "^auth_token:" pubspec.yaml > modified_auth_token.txt
           if [ $? -ne 0 ]; then
@@ -196,7 +196,7 @@ jobs:
           cat pubspec.yaml
           exit 1
           fi
-          
+
           # Output the modified line securely
           echo "Modified auth_token line:"
           cat modified_auth_token.txt

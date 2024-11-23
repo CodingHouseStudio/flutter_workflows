@@ -115,9 +115,11 @@ jobs:
       #     echo "buildNumber=$buildNumber" >> $GITHUB_ENV
       - name: Update pubspec.yaml
         env:
-          SENTRY_AUTH_TOKEN: ${{ inputs.sentry_auth_token }}
-          BUILD_NUMBER: ${{ inputs.build_number }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.sentry_auth_token }}
+          build_number: ${{ inputs.build_number }}
+        if: ${{ env.SENTRY_AUTH_TOKEN == 'Monday' }}
         run: |
+          echo "build_number=$build_number" >> $GITHUB_ENV
           # Determine the build number
           build_number="$BUILD_NUMBER"
           if [ -z "$build_number" ]; then
@@ -125,7 +127,7 @@ jobs:
           fi
       
           # Update auth_token and version in pubspec.yaml
-          sed -i "s/^auth_token: .*/auth_token: $SENTRY_AUTH_TOKEN/" pubspec.yaml
+          sed -i "s/^auth_token: .*/auth_token: ${{env.SENTRY_AUTH_TOKEN}}/" pubspec.yaml
           sed -i "s/^version: .*/version: 1.0.2+$build_number/" pubspec.yaml
       
           # Export build number for later steps

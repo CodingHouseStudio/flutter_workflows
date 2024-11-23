@@ -142,8 +142,25 @@ jobs:
           sed "s/flutter_bootstrap.js/${{inputs.build_number}}.flutter_bootstrap.js/g" build/web/index.html >build/web/newindex.html
           mv build/web/newindex.html build/web/index.html
       - name: 📡 Run Sentry Dart Plugin
-        if: ${{inputs.run_sentry_plugin}}
-        run: flutter packages pub run sentry_dart_plugin
+        if: ${{ inputs.run_sentry_plugin }}
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        run: |
+          # Escape special characters in the token to prevent sed issues
+          escaped_token=$(echo "$SENTRY_AUTH_TOKEN" | sed 's/[&/]/\\&/g')
+          
+          # Modify source.cfg and export the modified line to a secure temporary file
+          sed -i "s/^auth_token:.*/auth_token: $escaped_token/" source.cfg
+          
+          # Verify the modified line
+          grep "^auth_token:" source.cfg > modified_auth_token.txt
+          
+          # Securely output the modified content for debugging
+          echo "Modified auth_token line:"
+          cat modified_auth_token.txt
+          
+          # Run the Sentry Dart Plugin
+          flutter packages pub run sentry_dart_plugin
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:

@@ -14,7 +14,7 @@ on:
 
 env:
   GITHUB_OUTPUT: ${{github.workspace}}/.github/workflows/output.txt
-  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL_VETERANAM }}
+  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
 jobs:
   clean_cloudflare_deployments:
@@ -23,23 +23,15 @@ jobs:
     steps:
       - name: Remove all deployments except active ones
         env:
-          CLOUDFLARE_API_TOKEN: ${{secrets.API_TOKEN}}
-          CLOUDFLARE_ACCOUNT_ID: ${{secrets.ACCOUNT_ID}}
+          CLOUDFLARE_API_TOKEN: ${{secrets.CLOUDFLARE_API_TOKEN}}
+          CLOUDFLARE_ACCOUNT_ID: ${{secrets.CLOUDFLARE_ACCOUNT_ID}}
           CLOUDFLARE_PROJECT_NAME: ${{inputs.project_name}}
         run: |
           echo "Fetching all deployments from Cloudflare API..."
-          deployments_response=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/${{inputs.project_name}}/deployments" \
+          # Fetch all deployments from Cloudflare API
+          deployments_response=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT_NAME/deployments" \
             -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN")
-
-          # Output the full response for debugging
-          echo "Deployments response: $deployments_response"
-
-          # Check if the response is empty or null
-          if [ -z "$deployments_response" ] || [ "$deployments_response" == "null" ]; then
-            echo "Error: Empty or null response from Cloudflare API"
-            exit 1
-          fi
-
+          
           echo "All deployments retrieved."
 
           # Extract IDs of active deployments
@@ -48,7 +40,6 @@ jobs:
 
           echo "Active deployment IDs: $active_deployment_ids"
 
-
           # Loop through each deployment and delete inactive ones
           echo "Starting cleanup of inactive deployments..."
           for deployment_id in $(echo "$deployments_response" | jq -r '.result[].id'); do
@@ -56,7 +47,7 @@ jobs:
               echo "Skipping active deployment ID: $deployment_id"
             else
               echo "Deleting inactive deployment ID: $deployment_id"
-              deletion_response=$(curl -s -X DELETE "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/${{inputs.project_name}}/deployments/$deployment_id" \
+              deletion_response=$(curl -s -X DELETE "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT_NAME/deployments/$deployment_id" \
                 -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN")
               echo "Deletion response: $deletion_response"
             fi

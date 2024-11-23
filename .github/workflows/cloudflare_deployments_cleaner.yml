@@ -28,7 +28,7 @@ jobs:
           CLOUDFLARE_PROJECT_NAME: ${{inputs.project_name}}
         run: |
           echo "Fetching all deployments from Cloudflare API..."
-          deployments_response=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT_NAME/deployments" \
+          deployments_response=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/${{inputs.project_name}}/deployments" \
             -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN")
 
           # Output the full response for debugging

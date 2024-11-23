@@ -56,7 +56,7 @@ jobs:
               echo "Skipping active deployment ID: $deployment_id"
             else
               echo "Deleting inactive deployment ID: $deployment_id"
-              deletion_response=$(curl -s -X DELETE "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT_NAME/deployments/$deployment_id" \
+              deletion_response=$(curl -s -X DELETE "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/${{inputs.project_name}}/deployments/$deployment_id" \
                 -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN")
               echo "Deletion response: $deletion_response"
             fi

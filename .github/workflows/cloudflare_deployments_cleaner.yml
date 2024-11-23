@@ -14,7 +14,7 @@ on:
 
 env:
   GITHUB_OUTPUT: ${{github.workspace}}/.github/workflows/output.txt
-  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL_VETERANAM }}
 
 jobs:
   clean_cloudflare_deployments:
@@ -29,8 +29,8 @@ jobs:
         run: |
           echo "Fetching all deployments from Cloudflare API..."
           # Fetch all deployments from Cloudflare API
-          deployments_response=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT_NAME/deployments" \
-            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN")
+          deployments_response=$(curl -s -X GET "https://api.cloudflare.com/client/v4/accounts/${{env.CLOUDFLARE_ACCOUNT_ID}}/pages/projects/${{env.CLOUDFLARE_PROJECT_NAME}}/deployments" \
+            -H "Authorization: Bearer ${{env.CLOUDFLARE_API_TOKEN}}")
           if echo "$deployments_response" | jq -e '.success' >/dev/null 2>&1; then
             echo "API request successful."
           else
@@ -53,8 +53,8 @@ jobs:
               echo "Skipping active deployment ID: $deployment_id"
             else
               echo "Deleting inactive deployment ID: $deployment_id"
-              deletion_response=$(curl -s -X DELETE "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PROJECT_NAME/deployments/$deployment_id" \
-                -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN")
+              deletion_response=$(curl -s -X DELETE "https://api.cloudflare.com/client/v4/accounts/${{env.CLOUDFLARE_ACCOUNT_ID}}/pages/projects/${{env.CLOUDFLARE_PROJECT_NAME}}/deployments/$deployment_id" \
+                -H "Authorization: Bearer ${{env.CLOUDFLARE_API_TOKEN}}")
               echo "Deletion response: $deletion_response"
             fi
           done

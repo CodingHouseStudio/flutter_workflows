@@ -149,11 +149,11 @@ jobs:
           # Escape special characters in the token to prevent sed issues
           escaped_token=$(echo "$SENTRY_AUTH_TOKEN" | sed 's/[&/]/\\&/g')
           
-          # Modify source.cfg and export the modified line to a secure temporary file
-          sed -i "s/^auth_token:.*/auth_token: $escaped_token/" source.cfg
+          # Modify pubspec.yaml and export the modified line to a secure temporary file
+          sed -i "s/^auth_token:.*/auth_token: $escaped_token/" pubspec.yaml
           
           # Verify the modified line
-          grep "^auth_token:" source.cfg > modified_auth_token.txt
+          grep "^auth_token:" pubspec.yaml > modified_auth_token.txt
           
           # Securely output the modified content for debugging
           echo "Modified auth_token line:"

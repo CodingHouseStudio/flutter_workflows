@@ -120,7 +120,7 @@ jobs:
            build_number=$(date +%s) # Use current timestamp if build_number is empty
           fi
           # Escape special characters in the token to prevent sed issues
-          escaped_token=$(echo "$TOKEN" | sed 's/[&/]/\\&/g')
+          escaped_token=$(echo "$SENTRY_AUTH_TOKEN" | sed 's/[&/]/\\&/g')
 
           # Update the source.cfg configuration file
           sed -i "s/^auth_token:.*/auth_token: $escaped_token/" source.cfg

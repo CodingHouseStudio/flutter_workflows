@@ -66,14 +66,15 @@ jobs:
 
           echo "Cleanup process completed."
   notify:
-    # if: always() # Ensures this job runs regardless of the completion status of dependent jobs
-    # timeout-minutes: 3
-    runs-on: ${{inputs.runs_on}}
-    # needs:
-    #   - clean_cloudflare_deployments
-    # secrets: inherit
+    if: always() # Ensures this job runs regardless of the completion status of dependent jobs
+    timeout-minutes: 3
+    needs:
+      - clean_cloudflare_deployments
+    secrets: inherit
     uses: ./.github/workflows/notification.yml
+    secrets: inherit
     with:
       job_status: ${{ needs.clean_cloudflare_deployments.result }}
       repository: ${{ github.repository }}
       branch: ${{ github.ref_name }}
+      runs_on: ${{inputs.runs_on}}

@@ -12,10 +12,14 @@ on:
       branch:
         required: true
         type: string
+      runs_on:
+        required: false
+        type: string
+        default: "ubuntu-latest"
 
 jobs:
   notification:
-    runs-on: ubuntu-latest
+    runs-on: ${{inputs.runs_on}}
     steps:
       - name: Notify on Success
         if: ${{ inputs.job_status == 'success' }}

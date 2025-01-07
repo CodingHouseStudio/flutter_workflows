@@ -125,7 +125,6 @@ jobs:
   notify:
     if: always() # Ensures this job runs regardless of the completion status of dependent jobs
     timeout-minutes: 3
-    runs-on: ${{inputs.runs_on}}
     needs:
       - build
     secrets: inherit
@@ -134,6 +133,7 @@ jobs:
       job_status: ${{ needs.build.result }}
       repository: ${{ github.repository }}
       branch: ${{ github.ref_name }}
+      runs_on: ${{inputs.runs_on}}
       #  build_coverage:
   #    timeout-minutes: 30
   #    defaults:

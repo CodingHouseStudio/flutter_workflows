@@ -122,19 +122,12 @@ jobs:
           path: ${{inputs.working_directory}}/coverage/lcov.info
           exclude: ${{inputs.coverage_excludes}}
           min_coverage: ${{inputs.min_coverage}}
-          
-  notification:
+  notify:
     if: always() # Ensures this job runs regardless of the completion status of dependent jobs
     timeout-minutes: 3
     runs-on: ubuntu-latest
     needs:
       - build
-  notify:
-    if: always() # Ensures this job runs regardless of the completion status of dependent jobs
-      timeout-minutes: 3
-      runs-on: ubuntu-latest
-      needs:
-        - build
     secrets: inherit
     uses: ./.github/workflows/notofication.yml
     with:

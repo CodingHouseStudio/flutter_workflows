@@ -74,6 +74,6 @@ jobs:
     secrets: inherit
     uses: ./.github/workflows/notofication.yml
     with:
-      job_status: ${{ needs.build.result }}
+      job_status: ${{ needs.clean_cloudflare_deployments.result }}
       repository: ${{ github.repository }}
       branch: ${{ github.ref_name }}

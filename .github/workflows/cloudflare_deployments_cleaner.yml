@@ -66,6 +66,10 @@ jobs:
 
           echo "Cleanup process completed."
   notification:
+    if: always() # Ensures this job runs regardless of the completion status of dependent jobs
+    timeout-minutes: 3
+    needs:
+      - clean_cloudflare_deployments
     runs-on: ${{inputs.runs_on}}
     steps:
       - name: Notify on Success

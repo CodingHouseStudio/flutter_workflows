@@ -65,19 +65,6 @@ jobs:
           done
 
           echo "Cleanup process completed."
-  # notification:
-  #   if: always() # Ensures this job runs regardless of the completion status of dependent jobs
-  #   timeout-minutes: 3
-  #   needs:
-  #     - clean_cloudflare_deployments
-  #   runs-on: ${{inputs.runs_on}}
-  #   steps:
-  #     - name: Notify on Success
-  #       uses: appleboy/telegram-action@master
-  #       with:
-  #         to: ${{ secrets.TELEGRAM_CHAT_ID }}
-  #         token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-  #         message: "✅ Build successful for ."
   notify:
     if: always() # Ensures this job runs regardless of the completion status of dependent jobs
     needs:
@@ -86,6 +73,6 @@ jobs:
     secrets: inherit
     with:
       job_status: ${{ needs.clean_cloudflare_deployments.result }}
-      repository: ${{ github.repository }}
+      workflow: ${{ github.workflow }}
       branch: ${{ github.ref_name }}
       runs_on: ${{inputs.runs_on}}

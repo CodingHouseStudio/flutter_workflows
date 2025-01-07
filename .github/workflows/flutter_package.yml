@@ -126,7 +126,7 @@ jobs:
     if: always()
     needs: build
     secrets: inherit
-    uses: ./.github/workflows/telegram_notofication.yml
+    uses: ./.github/workflows/notofication.yml
     with:
       job_status: ${{ needs.build.result }}
       repository: ${{ github.repository }}

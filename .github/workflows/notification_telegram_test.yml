@@ -2,7 +2,7 @@ name: Notify Telegram on Success
 
 on:
   workflow_run:
-    workflows: ["Test"]
+    workflows: [main]
     types:
       - completed
 

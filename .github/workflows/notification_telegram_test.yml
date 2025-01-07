@@ -3,8 +3,6 @@ name: Notify Telegram on Success
 on:
   workflow_run:
     workflows: [main]
-    types:
-      - completed
 
 jobs:
   telegram-notification:

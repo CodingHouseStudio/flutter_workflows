@@ -125,7 +125,7 @@ jobs:
   notify:
     if: always()
     needs: build
-    uses: ./.github/workflows/slack-notification.yml
+    uses: ./.github/workflows/telegram_notofication.yml
     with:
       job_status: ${{ needs.build.result }}
       repository: ${{ github.repository }}

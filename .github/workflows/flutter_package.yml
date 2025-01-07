@@ -129,31 +129,18 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - build
-    steps:
-      - name: Notify on Success
-        # if: ${{ inputs.job_status == 'success' }}
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.TELEGRAM_CHAT_ID }}
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: "✅ Build successful for ."
-
-      # - name: Notify on Failure
-      #   if: ${{ inputs.job_status == 'failure' }}
-      #   uses: appleboy/telegram-action@master
-      #   with:
-      #     to: ${{ secrets.TELEGRAM_CHAT_ID }}
-      #     token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-      #     message: "❌ Build failed for **."
-  # notify:
-  #   if: always()
-  #   needs: build
-  #   secrets: inherit
-  #   uses: ./.github/workflows/notofication.yml
-  #   with:
-  #     job_status: ${{ needs.build.result }}
-  #     repository: ${{ github.repository }}
-  #     branch: ${{ github.ref_name }}
+  notify:
+    if: always() # Ensures this job runs regardless of the completion status of dependent jobs
+      timeout-minutes: 3
+      runs-on: ubuntu-latest
+      needs:
+        - build
+    secrets: inherit
+    uses: ./.github/workflows/notofication.yml
+    with:
+      job_status: ${{ needs.build.result }}
+      repository: ${{ github.repository }}
+      branch: ${{ github.ref_name }}
       #  build_coverage:
   #    timeout-minutes: 30
   #    defaults:

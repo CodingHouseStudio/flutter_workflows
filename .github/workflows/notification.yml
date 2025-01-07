@@ -19,6 +19,7 @@ on:
 
 jobs:
   notification:
+    timeout-minutes: 3
     runs-on: ${{inputs.runs_on}}
     steps:
       - name: Notify on Success

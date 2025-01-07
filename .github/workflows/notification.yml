@@ -36,4 +36,4 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: "❌ Build failed for *${{ inputs.workflow }}* on branch *${{ inputs.branch }}*."
+          message: "❌ Build failed for "${{ inputs.workflow }}" on branch "${{ inputs.branch }}"."

@@ -124,14 +124,13 @@ jobs:
           min_coverage: ${{inputs.min_coverage}}
   notify:
     if: always() # Ensures this job runs regardless of the completion status of dependent jobs
-    timeout-minutes: 3
     needs:
       - build
+    uses: ./.github/workflows/notification.yml
     secrets: inherit
-    uses: ./.github/workflows/notofication.yml
     with:
       job_status: ${{ needs.build.result }}
-      repository: ${{ github.repository }}
+      workflow: ${{ github.workflow }}
       branch: ${{ github.ref_name }}
       runs_on: ${{inputs.runs_on}}
       #  build_coverage:

@@ -152,6 +152,17 @@ jobs:
           accountId: ${{secrets.ACCOUNT_ID}}
           projectName: ${{inputs.project_name}}
           directory: ${{inputs.directory}}
+  notify:
+    if: always() # Ensures this job runs regardless of the completion status of dependent jobs
+    needs:
+      - build
+    uses: ./.github/workflows/notification.yml
+    secrets: inherit
+    with:
+      job_status: ${{ needs.build.result }}
+      workflow: ${{ github.workflow }}
+      branch: ${{ github.ref_name }}
+      runs_on: ${{inputs.runs_on}}
 #  android-build:
 #    runs-on: ubuntu-latest
 #    timeout-minutes: 30

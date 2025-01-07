@@ -1,4 +1,4 @@
-name: Notify Telegram
+name: Notify
 
 on:
   workflow_call:
@@ -14,10 +14,10 @@ on:
         type: string
 
 jobs:
-  telegram-notification:
+  notification:
     runs-on: ubuntu-latest
     steps:
-      - name: Notify Telegram on Success
+      - name: Notify on Success
         if: ${{ inputs.job_status == 'success' }}
         uses: appleboy/telegram-action@master
         with:
@@ -25,7 +25,7 @@ jobs:
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           message: "✅ Build successful for *${{ inputs.repository }}* on branch *${{ inputs.branch }}*."
 
-      - name: Notify Telegram on Failure
+      - name: Notify on Failure
         if: ${{ inputs.job_status == 'failure' }}
         uses: appleboy/telegram-action@master
         with:

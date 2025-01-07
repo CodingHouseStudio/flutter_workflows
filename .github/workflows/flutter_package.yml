@@ -125,6 +125,7 @@ jobs:
   notify:
     if: always()
     needs: build
+    secrets: inherit
     uses: ./.github/workflows/telegram_notofication.yml
     with:
       job_status: ${{ needs.build.result }}

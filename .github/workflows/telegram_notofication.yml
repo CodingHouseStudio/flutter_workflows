@@ -1,0 +1,34 @@
+name: Notify Telegram
+
+on:
+  workflow_call:
+    inputs:
+      job_status:
+        required: true
+        type: string
+      repository:
+        required: true
+        type: string
+      branch:
+        required: true
+        type: string
+
+jobs:
+  telegram-notification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Telegram on Success
+        if: ${{ inputs.job_status == 'success' }}
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          message: "✅ Build successful for *${{ inputs.repository }}* on branch *${{ inputs.branch }}*."
+
+      - name: Notify Telegram on Failure
+        if: ${{ inputs.job_status == 'failure' }}
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          message: "❌ Build failed for *${{ inputs.repository }}* on branch *${{ inputs.branch }}*."

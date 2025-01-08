@@ -161,7 +161,7 @@ jobs:
     with:
       job_status: ${{ needs.build.result }}
       workflow: ${{ github.workflow }}
-      branch: ${{ github.ref_name }}
+      branch: ${{ github.branch }}
       runs_on: ${{inputs.runs_on}}
 #  android-build:
 #    runs-on: ubuntu-latest

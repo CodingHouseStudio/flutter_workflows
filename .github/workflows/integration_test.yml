@@ -163,7 +163,7 @@ jobs:
     with:
       job_status: ${{ needs.integration-web-chrome.result }}
       workflow: ${{ github.workflow }}
-      branch: ${{ github.ref_name }}
+      branch: ${{ github.branch }}
       runs_on: ${{inputs.runs_on}}
   #  integration-web-edge:
   #    timeout-minutes: 15

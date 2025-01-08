@@ -29,6 +29,10 @@ on:
         required: false
         type: string
         default: "./build/web"
+      runs_on:
+        required: false
+        type: string
+        default: "ubuntu-latest"
 
       # web_renderer:
       #   required: false
@@ -87,7 +91,7 @@ jobs:
   #          GIT_AUTHORIZATION: '${{ secrets.GIT_AUTHORIZATION }}'
   #          MATCH_PASSWORD: '${{ secrets.MATCH_PASSWORD }}'
   build:
-    runs-on: ubuntu-latest # We are using ubuntu to deploy flutter web
+    runs-on: ${{inputs.runs_on}} # We are using ubuntu to deploy flutter web
     timeout-minutes: 20
     environment: ${{inputs.FLAVOUR}}
     permissions: # set permissions for AWS creentials specifically

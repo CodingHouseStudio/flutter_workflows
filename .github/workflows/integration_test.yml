@@ -15,7 +15,6 @@ on:
         required: false
         type: string
         default: "ubuntu-latest"
-      on:
 
 env:
   GITHUB_OUTPUT: ${{github.workspace}}/.github/workflows/output.txt

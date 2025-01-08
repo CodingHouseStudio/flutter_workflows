@@ -15,6 +15,8 @@ on:
         required: false
         type: string
         default: "ubuntu-latest"
+      on:
+
 env:
   GITHUB_OUTPUT: ${{github.workspace}}/.github/workflows/output.txt
   SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL_VETERANAM }}
@@ -163,7 +165,6 @@ jobs:
     with:
       job_status: ${{ needs.integration-web-chrome.result }}
       workflow: ${{ github.workflow }}
-      branch: ${{ github.head_ref  }}
       runs_on: ${{inputs.runs_on}}
   #  integration-web-edge:
   #    timeout-minutes: 15

@@ -10,7 +10,7 @@ on:
         required: true
         type: string
       branch:
-        required: true
+        required: false
         type: string
       runs_on:
         required: false
@@ -20,7 +20,7 @@ on:
 jobs:
   notification:
     timeout-minutes: 3
-    runs-on: ${{inputs.runs_on}}
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - name: Notify on Success
         if: ${{ inputs.job_status == 'success' }}
@@ -28,7 +28,7 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: "✅ Build successful for ${{ inputs.workflow }} on branch ${{ inputs.branch }}."
+          message: ${{ inputs.branch && inputs.branch != '' && format('✅ Build successful for {0} on branch {1}.', inputs.workflow, inputs.branch) || format('✅ Build successful for {0}.', inputs.workflow) }}
 
       - name: Notify on Failure
         if: ${{ inputs.job_status == 'failure' }}
@@ -36,4 +36,4 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: "❌ Build failed for ${{ inputs.workflow }} on branch ${{ inputs.branch }}."
+          message: ${{ inputs.branch && inputs.branch != '' && format('❌ Build failed for {0} on branch {1}.', inputs.workflow, inputs.branch) || format('❌ Build failed for {0}.', inputs.workflow) }}

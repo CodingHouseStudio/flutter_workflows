@@ -59,6 +59,10 @@ on:
         required: false
         type: string
         default: "!*"
+      branch:
+        required: true
+        type: string
+        default: "main"
     secrets:
       ssh_key:
         required: false
@@ -131,7 +135,7 @@ jobs:
     with:
       job_status: ${{ needs.build.result }}
       workflow: ${{ github.workflow }}
-      branch: ${{ github.head_ref  }}
+      branch: ${{ inputs.branch  }}
       runs_on: ${{inputs.runs_on}}
       #  build_coverage:
   #    timeout-minutes: 30

@@ -9,9 +9,10 @@ on:
       workflow:
         required: true
         type: string
-      branch:
+      dop_text:
         required: false
         type: string
+        default: ""
       runs_on:
         required: false
         type: string
@@ -28,7 +29,7 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: ${{ inputs.branch && inputs.branch != '' && format('✅ Build successful for {0} on branch {1}.', inputs.workflow, inputs.branch) || format('✅ Build successful for {0}.', inputs.workflow) }}
+          message: ${{ format('✅ Build successful for {0}{1}.', inputs.workflow, inputs.dop_text != '' ? '\n' + inputs.dop_text : '') }}
 
       - name: Notify on Failure
         if: ${{ inputs.job_status == 'failure' }}
@@ -36,4 +37,4 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: ${{ inputs.branch && inputs.branch != '' && format('❌ Build failed for {0} on branch {1}.', inputs.workflow, inputs.branch) || format('❌ Build failed for {0}.', inputs.workflow) }}
+          message: ${{ format('❌ Build failed for {0}{1}.', inputs.workflow, inputs.dop_text != '' ? '\n' + inputs.dop_text : '') }}

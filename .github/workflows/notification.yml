@@ -29,7 +29,7 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: ${{ format('✅ Build successful for {0}{1}.', inputs.workflow, inputs.dop_text != '' && '\n' + inputs.dop_text || '') }}
+          message: ${{ format('✅ Build successful for {0}{1}.', inputs.workflow, inputs.dop_text != '' && join('\n', inputs.dop_text) || '') }}
 
       - name: Notify on Failure
         if: ${{ inputs.job_status == 'failure' }}
@@ -37,4 +37,4 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: ${{ format('❌ Build failed for {0}{1}.', inputs.workflow, inputs.dop_text != '' && '\n' + inputs.dop_text || '') }}
+          message: ${{ format('❌ Build failed for {0}{1}.', inputs.workflow, inputs.dop_text != '' && join('\n', inputs.dop_text) || '') }}

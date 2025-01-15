@@ -134,7 +134,7 @@ jobs:
     with:
       job_status: ${{ needs.build.result }}
       workflow: ${{ github.workflow }}
-      dop_text: ${{ format('Pull Request - ' ,inputs.pull_request)  }}
+      dop_text: ${{ format('Pull Request - {0}' ,inputs.pull_request)  }}
       runs_on: ${{inputs.runs_on}}
       #  build_coverage:
   #    timeout-minutes: 30

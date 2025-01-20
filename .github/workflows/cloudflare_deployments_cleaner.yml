@@ -74,5 +74,4 @@ jobs:
     with:
       job_status: ${{ needs.clean_cloudflare_deployments.result }}
       workflow: ${{ github.workflow }}
-      branch: ${{ github.head_ref  }}
       runs_on: ${{inputs.runs_on}}

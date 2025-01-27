@@ -82,6 +82,14 @@ jobs:
           architecture: x64 # optional, x64 or arm64
           flutter-version: ${{inputs.flutter_version}}
 
+      - name: 🤫 Set SSH Key
+        env:
+          ssh_key: ${{secrets.ssh_key}}
+        if: env.ssh_key != null
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{secrets.ssh_key}}
+
       - name: 📦 Install Dependencies
         run: |
           flutter pub get
@@ -98,12 +106,6 @@ jobs:
       - name: 🧪 Run Tests
         run: very_good test -j ${{inputs.concurrency}} ${{(inputs.test_recursion && '--recursive') || ''}} ${{(inputs.test_optimization && '--optimization') || '--no-optimization'}} --coverage --test-randomize-ordering-seed random
 
-      - name: 📊 Check Code Coverage
-        uses: VeryGoodOpenSource/very_good_coverage@v3
-        with:
-          path: ${{inputs.working_directory}}/coverage/lcov.info
-          exclude: ${{inputs.coverage_excludes}}
-          min_coverage: ${{inputs.min_coverage}}
           
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
@@ -112,6 +114,13 @@ jobs:
           files: ${{inputs.working_directory}}/coverage/lcov.info
           fail_ci_if_error: true
           exclude: lib/shared/**
+          
+      - name: 📊 Check Code Coverage
+        uses: VeryGoodOpenSource/very_good_coverage@v3
+        with:
+          path: ${{inputs.working_directory}}/coverage/lcov.info
+          exclude: ${{inputs.coverage_excludes}}
+          min_coverage: ${{inputs.min_coverage}}
 
       - name: Get coverage from Codecov
         run: |

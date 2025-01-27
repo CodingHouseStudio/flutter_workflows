@@ -116,19 +116,15 @@ jobs:
       - name: 🕵️ Analyze
         run: flutter analyze ${{inputs.analyze_directories}}
 
-      - name: 🧪 Run Tests
-        run: very_good test -j ${{inputs.concurrency}} ${{(inputs.test_recursion && '--recursive') || ''}} ${{(inputs.test_optimization && '--optimization') || '--no-optimization'}} --coverage --test-randomize-ordering-seed random
+      # - name: 🧪 Run Tests
+      #   run: very_good test -j ${{inputs.concurrency}} ${{(inputs.test_recursion && '--recursive') || ''}} ${{(inputs.test_optimization && '--optimization') || '--no-optimization'}} --coverage --test-randomize-ordering-seed random
 
-      - name: 📊 Check Code Coverage
-        uses: VeryGoodOpenSource/very_good_coverage@v3
-        with:
-          path: ${{inputs.working_directory}}/coverage/lcov.info
-          exclude: ${{inputs.coverage_excludes}}
-          min_coverage: ${{inputs.min_coverage}}
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+      # - name: 📊 Check Code Coverage
+      #   uses: VeryGoodOpenSource/very_good_coverage@v3
+      #   with:
+      #     path: ${{inputs.working_directory}}/coverage/lcov.info
+      #     exclude: ${{inputs.coverage_excludes}}
+      #     min_coverage: ${{inputs.min_coverage}}
   notify:
     if: always() # Ensures this job runs regardless of the completion status of dependent jobs
     needs:

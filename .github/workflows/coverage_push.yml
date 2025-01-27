@@ -110,7 +110,8 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ${{inputs.working_directory}}/coverage/lcov.info
-          ignore: "lib/shared"
+          ignore:
+            - "lib/shared"
             #${{inputs.coverage_excludes}}
           fail_ci_if_error: true
           

@@ -1,0 +1,125 @@
+name: Code Coverage
+
+env:
+  GITHUB_OUTPUT: ${{github.workspace}}/.github/workflows/output.txt
+  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL_VETERANAM }}
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: write # This is required for actions/checkout 
+
+on:
+  workflow_call:
+    inputs:
+      concurrency:
+        required: false
+        type: number
+        default: 4
+      coverage_excludes:
+        required: true
+        type: string
+      flutter_channel:
+        required: false
+        type: string
+        default: "stable"
+      flutter_version:
+        required: false
+        type: string
+        default: "3.27.1"
+      format_directories:
+        required: false
+        type: string
+        default: "lib test"
+      min_coverage:
+        required: false
+        type: number
+        default: 100
+      runs_on:
+        required: false
+        type: string
+        default: "ubuntu-latest"
+      setup:
+        required: false
+        type: string
+        default: ""
+      test_optimization:
+        required: false
+        type: boolean
+        default: true
+      test_recursion:
+        required: false
+        type: boolean
+        default: false
+      working_directory:
+        required: false
+        type: string
+        default: "."
+      package_get_excludes:
+        required: false
+        type: string
+        default: "!*"
+    secrets:
+      ssh_key:
+        required: false
+
+jobs:
+  build:
+    timeout-minutes: 30
+    environment: "production"
+    defaults:
+      run:
+        working-directory: ${{inputs.working_directory}}
+    runs-on: ${{inputs.runs_on}}
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - uses: subosito/flutter-action@v2.12.0
+        with:
+          channel: ${{inputs.flutter_channel}}
+          cache: true
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:" # optional, change this to force refresh cache
+          cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:" # optional, change this to specify the cache path
+          architecture: x64 # optional, x64 or arm64
+          flutter-version: ${{inputs.flutter_version}}
+
+      - name: 📦 Install Dependencies
+        run: |
+          flutter pub get
+      - run: |
+          flutter pub run build_runner build --delete-conflicting-outputs
+      - run: |
+          flutter pub global activate very_good_cli
+          very_good packages get --recursive --ignore=${{inputs.package_get_excludes}}
+
+      - name: ⚙️ Run Setup
+        if: "${{inputs.setup != ''}}"
+        run: ${{inputs.setup}}
+
+      - name: 🧪 Run Tests
+        run: very_good test -j ${{inputs.concurrency}} ${{(inputs.test_recursion && '--recursive') || ''}} ${{(inputs.test_optimization && '--optimization') || '--no-optimization'}} --coverage --test-randomize-ordering-seed random
+
+      - name: 📊 Check Code Coverage
+        uses: VeryGoodOpenSource/very_good_coverage@v3
+        with:
+          path: ${{inputs.working_directory}}/coverage/lcov.info
+          exclude: ${{inputs.coverage_excludes}}
+          min_coverage: ${{inputs.min_coverage}}
+        # Capture the coverage percentage
+        continue-on-error: true
+        run: |
+          coverage_percent=$(grep -oP 'lines.*\K(\d+\.\d+)' ${{inputs.working_directory}}/coverage/lcov-report/index.html)
+          echo "coverage_percent=$coverage_percent" >> $GITHUB_ENV
+          
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+  notify:
+    if: always() # Ensures this job runs regardless of the completion status of dependent jobs
+    needs:
+      - build
+    uses: ./.github/workflows/notification.yml
+    secrets: inherit
+    with:
+      job_status: ${{ needs.build.result }}
+      workflow: ${{ github.workflow }}
+      dop_text: ${{ format('Coverage - {0}' ,inputs.coverage_percent)  }}
+      runs_on: ${{inputs.runs_on}}

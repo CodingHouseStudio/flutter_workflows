@@ -119,8 +119,6 @@ jobs:
           ignore: ${{inputs.coverage_excludes}}
   notify:
     if: always() # Ensures this job runs regardless of the completion status of dependent jobs
-    env:
-      COVERAGE: ${{ needs.build.outputs.COVERAGE }}
     needs:
       - build
     uses: ./.github/workflows/notification.yml
@@ -128,5 +126,5 @@ jobs:
     with:
       job_status: ${{ needs.build.result }}
       workflow: ${{ github.workflow }}
-      dop_text: ${{ format('Coverage - {0}', env.COVERAGE) }}
+      dop_text: ${{ format('Coverage - {0}', $needs.build.outputs.COVERAGE) }}
       runs_on: ${{inputs.runs_on}}

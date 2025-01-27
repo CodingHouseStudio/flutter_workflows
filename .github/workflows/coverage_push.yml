@@ -111,10 +111,8 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ${{inputs.working_directory}}/coverage/lcov.info
           fail_ci_if_error: true
-        ignore:
-          - "lib/shared"
-          #${{inputs.coverage_excludes}}
-          
+          exclude: lib/shared/**
+
       - name: Get coverage from Codecov
         run: |
           curl -s https://codecov.io/api/v2/project/github/${{ github.repository }}/commit/${{ github.sha }}/report | jq '.commit.totals.c' > coverage.txt

@@ -104,19 +104,20 @@ jobs:
           path: ${{inputs.working_directory}}/coverage/lcov.info
           exclude: ${{inputs.coverage_excludes}}
           min_coverage: ${{inputs.min_coverage}}
-
-      - name: 📊 Save Code Coverage
-        id: save-code-coverage
-        continue-on-error: true
-        run: |
-          coverage_percent=$(grep -oP 'lines.*\K(\d+\.\d+)' ${{inputs.working_directory}}/coverage/lcov-report/index.html)
-          echo "COVERAGE=$coverage_percent" >> $GITHUB_OUTPUT
           
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          ignore: ${{inputs.coverage_excludes}}
+          gcov_ignore: ${{inputs.coverage_excludes}}
+
+      - name: Fetch Coverage Percentage from Codecov
+        run: |
+          COVERAGE_API_URL="https://api.codecov.io/api/gh/${{ github.repository }}/commits/${{ github.sha }}"
+          COVERAGE_JSON=$(curl -s --header "Authorization: token ${{ secrets.CODECOV_TOKEN }}" $COVERAGE_API_URL)
+          COVERAGE_PERCENT=$(echo $COVERAGE_JSON | jq '.commit.coverage')
+          echo "Coverage Percentage: $COVERAGE_PERCENT"
+          echo "COVERAGE=$COVERAGE_PERCENT" >> $GITHUB_OUTPUT
   notify:
     if: always() # Ensures this job runs regardless of the completion status of dependent jobs
     needs:

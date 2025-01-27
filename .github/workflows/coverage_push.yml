@@ -109,15 +109,19 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          gcov_ignore: ${{inputs.coverage_excludes}}
-
-      - name: Fetch Coverage Percentage from Codecov
+          files: ${{inputs.working_directory}}/coverage/lcov.info
+          flags: ${{inputs.coverage_excludes}}
+          
+      - name: Get coverage from Codecov
         run: |
-          COVERAGE_API_URL="https://api.codecov.io/api/gh/${{ github.repository }}/commits/${{ github.sha }}"
-          COVERAGE_JSON=$(curl -s --header "Authorization: token ${{ secrets.CODECOV_TOKEN }}" $COVERAGE_API_URL)
-          COVERAGE_PERCENT=$(echo $COVERAGE_JSON | jq '.commit.coverage')
-          echo "Coverage Percentage: $COVERAGE_PERCENT"
-          echo "COVERAGE=$COVERAGE_PERCENT" >> $GITHUB_OUTPUT
+          curl -s https://codecov.io/api/v2/project/github/${{ github.repository }}/commit/${{ github.sha }}/report | jq '.commit.totals.c' > coverage.txt
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Save coverage to output
+        id: save_coverage
+        run: echo "COVERAGE=$(cat coverage.txt)" >> $GITHUB_ENV
+        
   notify:
     if: always() # Ensures this job runs regardless of the completion status of dependent jobs
     needs:

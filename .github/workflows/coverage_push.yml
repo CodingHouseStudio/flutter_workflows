@@ -126,5 +126,5 @@ jobs:
     with:
       job_status: ${{ needs.build.result }}
       workflow: ${{ github.workflow }}
-      dop_text: ${{ format('Coverage - {0}', $needs.build.outputs.COVERAGE) }}
+      dop_text: ${{ format('Coverage - {0}', ${{ needs.build.outputs.COVERAGE }}) }}
       runs_on: ${{inputs.runs_on}}

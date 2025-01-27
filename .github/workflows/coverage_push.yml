@@ -60,7 +60,7 @@ on:
       codecov_path:
         required: false
         type: string
-        default: "./.github/workflows/config/codecov.yml"
+        default: ".github/workflows/config/codecov.yml"
     secrets:
       ssh_key:
         required: false

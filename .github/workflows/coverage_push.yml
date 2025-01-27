@@ -64,6 +64,8 @@ on:
 jobs:
   build:
     timeout-minutes: 30
+    outputs:
+       COVERAGE: ${{ steps.save-code-coverage.outputs.COVERAGE }}
     environment: "production"
     defaults:
       run:
@@ -104,10 +106,11 @@ jobs:
           min_coverage: ${{inputs.min_coverage}}
 
       - name: 📊 Save Code Coverage
+        id: save-code-coverage
         continue-on-error: true
         run: |
           coverage_percent=$(grep -oP 'lines.*\K(\d+\.\d+)' ${{inputs.working_directory}}/coverage/lcov-report/index.html)
-          echo "coverage_percent=$coverage_percent" >> $GITHUB_ENV
+          echo "COVERAGE=$coverage_percent" >> $GITHUB_OUTPUT
           
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
@@ -116,6 +119,8 @@ jobs:
           ignore: ${{inputs.coverage_excludes}}
   notify:
     if: always() # Ensures this job runs regardless of the completion status of dependent jobs
+    env:
+      COVERAGE: ${{ needs.build.outputs.COVERAGE }}
     needs:
       - build
     uses: ./.github/workflows/notification.yml
@@ -123,5 +128,5 @@ jobs:
     with:
       job_status: ${{ needs.build.result }}
       workflow: ${{ github.workflow }}
-      dop_text: ${{ format('Coverage - {0}', env.coverage_percent) }}
+      dop_text: ${{ format('Coverage - {0}', env.COVERAGE) }}
       runs_on: ${{inputs.runs_on}}

@@ -113,6 +113,7 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          ignore: ${{inputs.coverage_excludes}}
   notify:
     if: always() # Ensures this job runs regardless of the completion status of dependent jobs
     needs:
@@ -122,5 +123,5 @@ jobs:
     with:
       job_status: ${{ needs.build.result }}
       workflow: ${{ github.workflow }}
-      dop_text: ${{ format('Coverage - {0}' ,inputs.coverage_percent)  }}
+      dop_text: ${{ format('Coverage - {0}' ,env.coverage_percent)  }}
       runs_on: ${{inputs.runs_on}}

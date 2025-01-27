@@ -111,6 +111,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ${{inputs.working_directory}}/coverage/lcov.info
           exclude: ${{inputs.coverage_excludes}}
+          fail_ci_if_error: true
           
       - name: Get coverage from Codecov
         run: |

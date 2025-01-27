@@ -113,7 +113,6 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ${{inputs.working_directory}}/coverage/lcov.info
           fail_ci_if_error: true
-          exclude: lib/shared/**
           
       - name: 📊 Check Code Coverage
         uses: VeryGoodOpenSource/very_good_coverage@v3

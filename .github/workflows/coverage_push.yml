@@ -110,7 +110,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ${{inputs.working_directory}}/coverage/lcov.info
-          flags: ${{inputs.coverage_excludes}}
+          exclude: ${{inputs.coverage_excludes}}
           
       - name: Get coverage from Codecov
         run: |
@@ -121,7 +121,7 @@ jobs:
       - name: Save coverage to output
         id: save_coverage
         run: echo "COVERAGE=$(cat coverage.txt)" >> $GITHUB_ENV
-        
+
   notify:
     if: always() # Ensures this job runs regardless of the completion status of dependent jobs
     needs:

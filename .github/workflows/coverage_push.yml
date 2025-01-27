@@ -123,6 +123,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ${{inputs.working_directory}}/coverage/lcov.info
           fail_ci_if_error: true
+          verbose: true
           codecov_yml_path: ${{inputs.codecov_path}}
 
       - name: Get coverage from Codecov

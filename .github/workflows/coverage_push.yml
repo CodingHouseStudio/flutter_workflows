@@ -123,5 +123,5 @@ jobs:
     with:
       job_status: ${{ needs.build.result }}
       workflow: ${{ github.workflow }}
-      dop_text: ${{ format('Coverage - {0}' ,env.coverage_percent)  }}
+      dop_text: ${{ format('Coverage - {0}', env.coverage_percent) }}
       runs_on: ${{inputs.runs_on}}

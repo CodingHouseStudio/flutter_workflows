@@ -130,16 +130,12 @@ jobs:
           fail_ci_if_error: true
           verbose: true
           codecov_yml_path: ${{inputs.codecov_path}}
-
-      - name: Get coverage from Codecov
+          
+      - name: Extract Coverage Percentage
+        id: save-code-coverage
         run: |
-          curl -s https://codecov.io/api/v2/project/github/${{ github.repository }}/commit/${{ github.sha }}/report | jq '.commit.totals.c' > coverage.txt
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Save coverage to output
-        id: save_coverage
-        run: echo "COVERAGE=$(cat coverage.txt)" >> $GITHUB_ENV
+          COVERAGE=$(lcov --summary coverage/lcov.info | awk '/lines/...{print $2}' | tr -d '%')
+          echo "COVERAGE=$COVERAGE" >> $GITHUB_OUTPUT
 
   notify:
     if: always() # Ensures this job runs regardless of the completion status of dependent jobs

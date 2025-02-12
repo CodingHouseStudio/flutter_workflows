@@ -1,0 +1,26 @@
+name: Firebase Deploy Functions
+
+env:
+  GITHUB_OUTPUT: ${{github.workspace}}/.github/workflows/output.txt
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: write # This is required for actions/checkout 
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+jobs:
+  deploy:
+    runs-on: ${{inputs.runs_on}} # We are using ubuntu to deploy flutter web
+    timeout-minutes: 20
+    environment: ${{inputs.environment}} 
+    steps:
+    - uses: actions/checkout@v4
+    - uses: jsryudev/deploy-firebase-functions@v20.0.1
+      env:
+        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        FUNCTIONS_DIR: ${{ vars.FIREBASE_FUNCTIONS_DIR }}
+        FIREBASE_PROJECT: ${{ vars.FIREBASE_PROJECT_ID }}

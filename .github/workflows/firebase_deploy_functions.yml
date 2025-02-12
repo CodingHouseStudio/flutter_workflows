@@ -12,10 +12,15 @@ on:
       environment:
         required: true
         type: string
+      runs_on:
+        required: false
+        type: string
+        default: "ubuntu-latest"
+
 jobs:
   deploy:
     runs-on: ${{inputs.runs_on}} # We are using ubuntu to deploy flutter web
-    timeout-minutes: 20
+    timeout-minutes: 10
     environment: ${{inputs.environment}} 
     steps:
     - uses: actions/checkout@v4

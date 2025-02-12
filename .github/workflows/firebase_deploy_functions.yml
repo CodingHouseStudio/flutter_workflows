@@ -9,7 +9,7 @@ permissions:
 on:
   workflow_call:
     inputs:
-      environment:
+      FLAVOUR:
         required: true
         type: string
       runs_on:
@@ -21,7 +21,7 @@ jobs:
   deploy:
     runs-on: ${{inputs.runs_on}} # We are using ubuntu to deploy flutter web
     timeout-minutes: 10
-    environment: ${{inputs.environment}} 
+    environment: ${{inputs.FLAVOUR}} 
     steps:
     - uses: actions/checkout@v4
     - uses: jsryudev/deploy-firebase-functions@v20.0.1

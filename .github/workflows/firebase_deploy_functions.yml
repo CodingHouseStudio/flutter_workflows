@@ -29,3 +29,13 @@ jobs:
         FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         FUNCTIONS_DIR: ${{ vars.FIREBASE_FUNCTIONS_DIR }}
         FIREBASE_PROJECT: ${{ vars.FIREBASE_PROJECT_ID }}
+  notify:
+    if: always() # Ensures this job runs regardless of the completion status of dependent jobs
+    needs:
+      - build
+    uses: ./.github/workflows/notification.yml
+    secrets: inherit
+    with:
+      job_status: ${{ needs.build.result }}
+      workflow: ${{ github.workflow }}
+      runs_on: ${{inputs.runs_on}}

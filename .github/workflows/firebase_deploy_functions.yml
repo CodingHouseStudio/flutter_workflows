@@ -32,7 +32,7 @@ jobs:
   notify:
     if: always() # Ensures this job runs regardless of the completion status of dependent jobs
     needs:
-      - build
+      - deploy
     uses: ./.github/workflows/notification.yml
     secrets: inherit
     with:

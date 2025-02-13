@@ -36,6 +36,6 @@ jobs:
     uses: ./.github/workflows/notification.yml
     secrets: inherit
     with:
-      job_status: ${{ needs.build.result }}
+      job_status: ${{ needs.deploy.result }}
       workflow: ${{ github.workflow }}
       runs_on: ${{inputs.runs_on}}

@@ -21,10 +21,6 @@ on:
         required: false
         type: string
         default: "stable"
-      flutter_version:
-        required: false
-        type: string
-        default: "3.27.1"
       format_directories:
         required: false
         type: string
@@ -84,7 +80,7 @@ jobs:
           cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:" # optional, change this to force refresh cache
           cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:" # optional, change this to specify the cache path
           architecture: x64 # optional, x64 or arm64
-          flutter-version: ${{inputs.flutter_version}}
+          flutter-version: ${{ vars.FLUTTER_FRAMEWORK_VERSION }}
 
       - name: 🤫 Set SSH Key
         env:

@@ -1,4 +1,4 @@
-name: Integration Test Workflow
+name: Web Integration Test
 
 on:
   workflow_call:

@@ -64,7 +64,7 @@ jobs:
           pushd android  
           flutter build apk --release --flavor ${{inputs.FLAVOUR}} -t lib/main_${{inputs.FLAVOUR}}.dart --dart-define=FLAVOUR=${{inputs.FLAVOUR}}  
           ./gradlew app:assembleAndroidTest  
-          ./gradlew app:app:assembleRelease -Ptarget="integration_test/discounts_test.dart"  
+          ./gradlew app:assembleRelease -Ptarget="integration_test/discounts_test.dart"  
           popd
 
       - name: ☁️ Setup Google Cloud SDK  

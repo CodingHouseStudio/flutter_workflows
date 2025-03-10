@@ -10,6 +10,10 @@ on:
         required: false  
         type: string  
         default: "ubuntu-latest"  
+      FLAVOUR:
+        required: true
+        type: string
+        default: "production"
 
 env:  
   GITHUB_OUTPUT: ${{github.workspace}}/.github/workflows/output.txt  
@@ -22,6 +26,7 @@ jobs:
     name: 🧪 Run Integration Tests
     timeout-minutes: 30  
     runs-on: ${{inputs.runs_on}}  
+    environment: ${{inputs.FLAVOUR}}
     steps:   
       - name: 📥 Checkout Repository  
         uses: actions/checkout@v4.1.1  
@@ -32,6 +37,11 @@ jobs:
           distribution: 'zulu'  
           java-version: "17.x"  
           cache: gradle  
+
+      - name: Decrypt Android keys
+        run: sh ./.github/scripts/decrypt_android_keys.sh
+        env:
+          ANDROID_KEYS_SECRET_PASSPHRASE: ${{ secrets.ANDROID_KEYS_SECRET_PASSPHRASE }}
 
       - name: 🎯 Setup Flutter  
         uses: subosito/flutter-action@v2.12.0  
@@ -55,7 +65,7 @@ jobs:
       - name: 🔨 Build APK for Firebase TestLab  
         run: |  
           pushd android  
-          flutter build apk --flavor production -t lib/main_production.dart --dart-define=FLAVOUR=production  
+          flutter build apk --flavor ${{inputs.FLAVOUR}} -t lib/main_${{inputs.FLAVOUR}}.dart --dart-define=FLAVOUR=${{inputs.FLAVOUR}}  
           ./gradlew app:assembleAndroidTest  
           ./gradlew app:assembleDebug -Ptarget="integration_test/discounts_test.dart"  
           popd  

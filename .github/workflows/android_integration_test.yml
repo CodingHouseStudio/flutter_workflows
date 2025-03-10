@@ -65,7 +65,7 @@ jobs:
       - name: 🔨 Build APK for Firebase TestLab  
         run: |  
           pushd android  
-          flutter build apk --flavor ${{inputs.FLAVOUR}} -t lib/main_${{inputs.FLAVOUR}}.dart --dart-define=FLAVOUR=${{inputs.FLAVOUR}}  
+          flutter build apk --release --flavor ${{inputs.FLAVOUR}} -t lib/main_${{inputs.FLAVOUR}}.dart --dart-define=FLAVOUR=${{inputs.FLAVOUR}}  
           ./gradlew app:assembleAndroidTest  
           ./gradlew app:assembleDebug -Ptarget="integration_test/discounts_test.dart"  
           popd  

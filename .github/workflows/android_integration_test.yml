@@ -72,7 +72,7 @@ jobs:
           fileName: integration_test_gcloud.json
           encodedString: ${{ secrets.INTEGRATION_TEST_GCLOUD_CONFIG }}
 
-      - name: 🔐 Authenticate with Google Cloud - VERBOSE - Single Quotes - Re-typed command
+      - name: Upload To Firebase Test Lab
         run: |
           gcloud auth activate-service-account --key-file="${{ steps.gcloud_config.outputs.filePath }}"
           # Re-typed command CAREFULLY, using single quotes for paths, and --verbosity=debug

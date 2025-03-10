@@ -1,109 +1,100 @@
-name: Android Integration Test  
-on:  
-  workflow_call:  
-    inputs:  
-      flutter_channel:  
-        required: false  
-        type: string  
-        default: "stable"  
-      runs_on:  
-        required: false  
-        type: string  
-        default: "ubuntu-latest"  
+name: Android Integration Test
+on:
+  workflow_call:
+    inputs:
+      flutter_channel:
+        required: false
+        type: string
+        default: "stable"
+      runs_on:
+        required: false
+        type: string
+        default: "ubuntu-latest"
       FLAVOUR:
         required: true
         type: string
         default: "production"
 
-env:  
-  GITHUB_OUTPUT: ${{github.workspace}}/.github/workflows/output.txt  
-permissions:  
-  id-token: write  
-  contents: read  
+env:
+  GITHUB_OUTPUT: ${{github.workspace}}/.github/workflows/output.txt
+permissions:
+  id-token: write
+  contents: read
 
-jobs:  
-  integration_test:  
+jobs:
+  integration_test:
     name: 🧪 Run Integration Tests
-    timeout-minutes: 30  
-    runs-on: ${{inputs.runs_on}}  
+    timeout-minutes: 30
+    runs-on: ${{inputs.runs_on}}
     environment: ${{inputs.FLAVOUR}}
-    steps:   
-      - name: 📥 Checkout Repository  
-        uses: actions/checkout@v4.1.1  
-
-      # - name: ☕ Setup Java  
-      #   uses: actions/setup-java@v3  
-      #   with:  
-      #     distribution: 'zulu'  
-      #     java-version: "17.x"  
-      #     cache: gradle  
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4.1.1
 
       - name: Decrypt Android keys
         run: sh ./.github/scripts/decrypt_android_keys.sh
         env:
           ANDROID_KEYS_SECRET_PASSPHRASE: ${{ secrets.ANDROID_KEYS_SECRET_PASSPHRASE }}
 
-      - name: 🎯 Setup Flutter  
-        uses: subosito/flutter-action@v2.12.0  
-        with:  
-          channel: ${{inputs.flutter_channel}}  
-          cache: true  
-          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"  
-          cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:"  
-          architecture: x64  
-          flutter-version: ${{ vars.FLUTTER_FRAMEWORK_VERSION }}  
+      - name: 🎯 Setup Flutter
+        uses: subosito/flutter-action@v2.12.0
+        with:
+          channel: ${{inputs.flutter_channel}}
+          cache: true
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
+          cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:"
+          architecture: x64
+          flutter-version: ${{ vars.FLUTTER_FRAMEWORK_VERSION }}
 
-      - name: 📦 Flutter Pub Get  
-        run: flutter pub get  
+      - name: 📦 Flutter Pub Get
+        run: flutter pub get
 
-      - name: ⚙️ Generate Build Files  
-        run: flutter pub run build_runner build --delete-conflicting-outputs  
+      - name: ⚙️ Generate Build Files
+        run: flutter pub run build_runner build --delete-conflicting-outputs
 
-      - name: 🔨 Build APK for Firebase TestLab  
-        run: |  
-          pushd android  
-          flutter build apk --release --flavor ${{inputs.FLAVOUR}} -t lib/main_${{inputs.FLAVOUR}}.dart --dart-define=FLAVOUR=${{inputs.FLAVOUR}}  
-          ./gradlew app:assembleAndroidTest  
-          ./gradlew app:assembleRelease -Ptarget="integration_test/discounts_test.dart"  
+      - name: 🔨 Build APK for Firebase TestLab
+        run: |
+          pushd android
+          flutter build apk --release --flavor ${{inputs.FLAVOUR}} -t lib/main_${{inputs.FLAVOUR}}.dart --dart-define=FLAVOUR=${{inputs.FLAVOUR}}
+          ./gradlew app:assembleAndroidTest
+          ./gradlew app:assembleRelease -Ptarget="integration_test/discounts_test.dart"
           popd
 
-      - name: ☁️ Setup Google Cloud SDK  
-        uses: google-github-actions/setup-gcloud@v2.1.0  
-        with:  
+      - name: ☁️ Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2.1.0
+        with:
           project_id: ${{ vars.FIREBASE_PROJECT_ID }}
 
-      - name: List APK files after build
+      - name: 🔑 Download Google Cloud Config
+        id: gcloud_config
+        uses: timheuer/base64-to-file@v1.0.3
+        with:
+          fileName: integration_test_gcloud.json
+          encodedString: ${{ secrets.INTEGRATION_TEST_GCLOUD_CONFIG }}
+
+      - name: 🔐 Authenticate with Google Cloud - VERBOSE - Single Quotes - Re-typed command
         run: |
-          ls -R build/app/outputs/apk/${{inputs.FLAVOUR}}/release/
-          ls -R build/app/outputs/apk/androidTest/${{inputs.FLAVOUR}}/debug
-          
-      - name: 🔑 Download Google Cloud Config  
-        id: gcloud_config  
-        uses: timheuer/base64-to-file@v1.0.3  
-        with:  
-          fileName: integration_test_gcloud.json  
-          encodedString: ${{ secrets.INTEGRATION_TEST_GCLOUD_CONFIG }}   
+          gcloud auth activate-service-account --key-file="${{ steps.gcloud_config.outputs.filePath }}"
+          # Re-typed command CAREFULLY, using single quotes for paths, and --verbosity=debug
+          gcloud firebase test android run \
+            --type=instrumentation \
+            --app 'build/app/outputs/apk/${{inputs.FLAVOUR}}/release/app-${{inputs.FLAVOUR}}-release.apk' \
+            --test 'build/app/outputs/apk/androidTest/${{inputs.FLAVOUR}}/debug/app-${{inputs.FLAVOUR}}-debug-androidTest.apk' \
+            --device-ids=MediumPhone.arm \
+            --os-version-ids=33 \
+            --orientations=portrait \
+            --use-orchestrator \
+            --timeout 3m \
+            --verbosity=debug
 
-      - name: 🔐 Authenticate with Google Cloud  
-        run: |  
-          gcloud auth activate-service-account --key-file="${{ steps.gcloud_config.outputs.filePath }}"  
-          gcloud firebase test android run --type=instrumentation \  
-            --app "build/app/outputs/apk/${{inputs.FLAVOUR}}/release/app-${{inputs.FLAVOUR}}-release.apk" \  
-            --test "build/app/outputs/apk/androidTest/${{inputs.FLAVOUR}}/debug/app-${{inputs.FLAVOUR}}-debug-androidTest.apk" \  
-            --device-ids=MediumPhone.arm \  
-            --os-version-ids=33 \  
-            --orientations=portrait \  
-            --use-orchestrator \  
-            --timeout 3m  
-
-  notify:  
-    name: 📢 Send Notification  
-    if: always() # Ensures this job runs regardless of the completion status of dependent jobs  
-    needs:  
-      - integration_test  
-    uses: ./.github/workflows/notification.yml  
-    secrets: inherit  
-    with:  
-      job_status: ${{ needs.integration_test.result }}  
-      workflow: ${{ github.workflow }}  
-      runs_on: ${{inputs.runs_on}}  
+  notify:
+    name: 📢 Send Notification
+    if: always() # Ensures this job runs regardless of the completion status of dependent jobs
+    needs:
+      - integration_test
+    uses: ./.github/workflows/notification.yml
+    secrets: inherit
+    with:
+      job_status: ${{ needs.integration_test.result }}
+      workflow: ${{ github.workflow }}
+      runs_on: ${{inputs.runs_on}}

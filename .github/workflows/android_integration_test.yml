@@ -31,12 +31,12 @@ jobs:
       - name: 📥 Checkout Repository  
         uses: actions/checkout@v4.1.1  
 
-      - name: ☕ Setup Java  
-        uses: actions/setup-java@v3  
-        with:  
-          distribution: 'zulu'  
-          java-version: "17.x"  
-          cache: gradle  
+      # - name: ☕ Setup Java  
+      #   uses: actions/setup-java@v3  
+      #   with:  
+      #     distribution: 'zulu'  
+      #     java-version: "17.x"  
+      #     cache: gradle  
 
       - name: Decrypt Android keys
         run: sh ./.github/scripts/decrypt_android_keys.sh
@@ -64,11 +64,8 @@ jobs:
           pushd android  
           flutter build apk --release --flavor ${{inputs.FLAVOUR}} -t lib/main_${{inputs.FLAVOUR}}.dart --dart-define=FLAVOUR=${{inputs.FLAVOUR}}  
           ./gradlew app:assembleAndroidTest  
-          ./gradlew app:assembleDebug -Ptarget="integration_test/discounts_test.dart"  
-          popd  
-
-      - name: 🔍 Check Generated APKs  
-        run: ls -R android/app/build/outputs/apk/  
+          ./gradlew app:app:assembleRelease -Ptarget="integration_test/discounts_test.dart"  
+          popd
 
       - name: ☁️ Setup Google Cloud SDK  
         uses: google-github-actions/setup-gcloud@v2.1.0  
@@ -80,22 +77,19 @@ jobs:
         uses: timheuer/base64-to-file@v1.0.3  
         with:  
           fileName: integration_test_gcloud.json  
-          encodedString: ${{ secrets.INTEGRATION_TEST_GCLOUD_CONFIG }}  
-
-      - name: 🛠️ Debug Google Cloud JSON Key  
-        run: ls -l integration_test_gcloud.json  
+          encodedString: ${{ secrets.INTEGRATION_TEST_GCLOUD_CONFIG }}   
 
       - name: 🔐 Authenticate with Google Cloud  
         run: |  
           gcloud auth activate-service-account --key-file="${{ steps.gcloud_config.outputs.filePath }}"  
           gcloud firebase test android run --type=instrumentation \  
-            --app "android/app/build/outputs/apk/debug/app-debug.apk" \  
-            --test "android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk" \  
+            --app "build/app/outputs/apk/${{inputs.FLAVOUR}}/release/app-${{inputs.FLAVOUR}}-release.apk" \  
+            --test "build/app/outputs/apk/androidTest/${{inputs.FLAVOUR}}/debug/app-${{inputs.FLAVOUR}}-debug-androidTest.apk" \  
             --device-ids=MediumPhone.arm \  
             --os-version-ids=33 \  
             --orientations=portrait \  
             --use-orchestrator \  
-            --timeout 10m  
+            --timeout 3m  
 
   notify:  
     name: 📢 Send Notification  

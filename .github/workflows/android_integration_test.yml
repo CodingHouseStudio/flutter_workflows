@@ -55,9 +55,9 @@ jobs:
       - name: 🔨 Build APK for Firebase TestLab
         run: |
           pushd android
-          flutter build apk --release --flavor ${{inputs.FLAVOUR}} -t lib/main_${{inputs.FLAVOUR}}.dart --dart-define=FLAVOUR=${{inputs.FLAVOUR}}
+          flutter build apk --debug --flavor ${{inputs.FLAVOUR}} -t lib/main_${{inputs.FLAVOUR}}.dart --dart-define=FLAVOUR=${{inputs.FLAVOUR}}
           ./gradlew app:assembleAndroidTest
-          ./gradlew app:assembleRelease -Ptarget="integration_test/discounts_test.dart"
+          ./gradlew app:assembleDebug -Ptarget="integration_test/discounts_test.dart"
           popd
 
       - name: ☁️ Setup Google Cloud SDK
@@ -78,8 +78,8 @@ jobs:
           # Re-typed command CAREFULLY, using single quotes for paths, and --verbosity=debug
           gcloud firebase test android run \
             --type=instrumentation \
-            --app 'build/app/outputs/apk/${{inputs.FLAVOUR}}/release/app-${{inputs.FLAVOUR}}-release.apk' \
-            --test 'build/app/outputs/apk/androidTest/${{inputs.FLAVOUR}}/debug/app-${{inputs.FLAVOUR}}-debug-androidTest.apk' \
+            --app 'build/app/outputs/apk/${{inputs.FLAVOUR}}/debug/app-${{inputs.FLAVOUR}}-debug.apk' \
+            --test 'buildbuild/app/outputs/apk/androidTest/${{inputs.FLAVOUR}}/debug/app-${{inputs.FLAVOUR}}-debug-androidTest.apk' \
             --device-ids=MediumPhone.arm \
             --os-version-ids=33 \
             --orientations=portrait \

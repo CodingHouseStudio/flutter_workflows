@@ -93,7 +93,7 @@ jobs:
           gcloud firebase test android run \
             --type=instrumentation \
             --app 'build/app/outputs/apk/${{inputs.FLAVOUR}}/debug/app-${{inputs.FLAVOUR}}-debug.apk' \
-            --test 'buildbuild/app/outputs/apk/androidTest/${{inputs.FLAVOUR}}/debug/app-${{inputs.FLAVOUR}}-debug-androidTest.apk' \
+            --test 'build/app/outputs/apk/androidTest/${{inputs.FLAVOUR}}/debug/app-${{inputs.FLAVOUR}}-debug-androidTest.apk' \
             --device-ids=MediumPhone.arm \
             --os-version-ids=33 \
             --orientations=portrait \

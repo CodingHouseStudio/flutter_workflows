@@ -55,10 +55,10 @@ jobs:
       - name: 🔨 Build APK for Firebase TestLab
         run: |
           pushd android
+          flutter build apk --debug --flavor ${{inputs.FLAVOUR}} -t lib/main_${{inputs.FLAVOUR}}.dart --dart-define=FLAVOUR=${{inputs.FLAVOUR}}
+          
           FLAVOUR_LOWERCASE="${{ inputs.FLAVOUR }}"
           FLAVOUR_CAPITALIZED="${FLAVOUR_LOWERCASE^}"
-
-          flutter build apk --debug --flavor ${{FLAVOUR_LOWERCASE}} -t lib/main_${{FLAVOUR_LOWERCASE}}.dart --dart-define=FLAVOUR=${{FLAVOUR_LOWERCASE}}
 
           ./gradlew app:assemble${{FLAVOUR_CAPITALIZED}}AndroidTest
           ./gradlew app:assemble${{FLAVOUR_CAPITALIZED}}Debug -Ptarget="integration_test/discounts_test.dart"

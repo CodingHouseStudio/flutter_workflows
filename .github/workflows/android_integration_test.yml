@@ -60,8 +60,8 @@ jobs:
           FLAVOUR_LOWERCASE="${{ inputs.FLAVOUR }}"
           FLAVOUR_CAPITALIZED="${FLAVOUR_LOWERCASE^}"
 
-          ./gradlew app:assemble${{FLAVOUR_CAPITALIZED}}AndroidTest
-          ./gradlew app:assemble${{FLAVOUR_CAPITALIZED}}Debug -Ptarget="integration_test/discounts_test.dart"
+          ./gradlew app:assemble${FLAVOUR_CAPITALIZED}AndroidTest
+          ./gradlew app:assemble${FLAVOUR_CAPITALIZED}Debug -Ptarget="integration_test/discounts_test.dart"
           popd
 
       - name: ☁️ Setup Google Cloud SDK

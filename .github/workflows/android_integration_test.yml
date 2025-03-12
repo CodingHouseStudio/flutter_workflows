@@ -64,11 +64,11 @@ jobs:
           FLAVOUR_CAPITALIZED="${FLAVOUR_LOWERCASE^}"
 
           ./gradlew app:assemble${FLAVOUR_CAPITALIZED}AndroidTest
-          
+
           IFS=',' read -ra TESTS <<< "${{ inputs.TEST_TARGETS }}"
           for TEST in "${TESTS[@]}"; do
             CLEAN_TEST=$(echo "$TEST" | sed 's/[()]//g' | xargs)
-            FULL_TEST_PATH="integration_test/${CLEAN_TEST}.dart"
+            FULL_TEST_PATH="integration_test/${CLEAN_TEST}_test.dart"
             ./gradlew app:assemble${FLAVOUR_CAPITALIZED}Debug -Ptarget="$FULL_TEST_PATH"
           done
 

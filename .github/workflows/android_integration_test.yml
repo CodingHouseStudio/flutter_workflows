@@ -14,6 +14,9 @@ on:
         required: true
         type: string
         default: "production"
+      TEST_TARGETS:
+        required: true
+        type: string
 
 env:
   GITHUB_OUTPUT: ${{github.workspace}}/.github/workflows/output.txt
@@ -61,7 +64,14 @@ jobs:
           FLAVOUR_CAPITALIZED="${FLAVOUR_LOWERCASE^}"
 
           ./gradlew app:assemble${FLAVOUR_CAPITALIZED}AndroidTest
-          ./gradlew app:assemble${FLAVOUR_CAPITALIZED}Debug -Ptarget="integration_test/discounts_test.dart"
+          
+          IFS=',' read -ra TESTS <<< "${{ inputs.TEST_TARGETS }}"
+          for TEST in "${TESTS[@]}"; do
+            CLEAN_TEST=$(echo "$TEST" | sed 's/[()]//g' | xargs)
+            FULL_TEST_PATH="integration_test/${CLEAN_TEST}.dart"
+            ./gradlew app:assemble${FLAVOUR_CAPITALIZED}Debug -Ptarget="$FULL_TEST_PATH"
+          done
+
           popd
 
       - name: ☁️ Setup Google Cloud SDK

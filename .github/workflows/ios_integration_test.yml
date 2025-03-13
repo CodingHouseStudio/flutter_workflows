@@ -62,8 +62,6 @@ jobs:
           output="../build/ios_integ"
           product="build/ios_integ/Build/Products"
 
-          flutter clean
-
           flutter build ios integration_test/${{ inputs.TEST_TARGETS }}_test.dart --debug --flavor ${{ inputs.FLAVOUR }} --dart-define=FLAVOUR=${{ inputs.FLAVOUR }} --no-codesign
 
           pushd ios
@@ -72,8 +70,8 @@ jobs:
             -scheme Runner \
             -xcconfig Flutter/Release.xcconfig \
             -configuration Release \
-            -derivedDataPath $output \
-            -sdk iphoneos
+            -derivedDataPath \ 
+            $output -sdk iphoneos
           popd
 
       - name: 📦 Zip iOS Test Artifacts

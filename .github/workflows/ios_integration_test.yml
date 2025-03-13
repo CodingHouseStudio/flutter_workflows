@@ -18,7 +18,7 @@ on:
       TEST_TARGETS:
         required: true
         type: string
-        description: "Enter test name separated by commas (without _test.dart), e.g.: foo,discounts"
+        description: "Enter test name separated by commas (without _test.dart), e.g.: discounts"
 
 env:
   GITHUB_OUTPUT: ${{ github.workspace }}/.github/workflows/output.txt

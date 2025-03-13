@@ -49,8 +49,8 @@ jobs:
       - name: 📦 Flutter Pub Get
         run: flutter pub get
 
-      - name: 🧹 Flutter Clean
-        run: flutter clean
+      - name: ⚙️ Generate Build Files
+        run: flutter pub run build_runner build --delete-conflicting-outputs
 
       - name: 🔨 Build iOS Integration Test App
         run: |

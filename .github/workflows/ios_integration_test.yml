@@ -60,6 +60,8 @@ jobs:
           output="../build/ios_integ"
           product="build/ios_integ/Build/Products"
 
+          flutter clea
+
           flutter build ios integration_test/${{ inputs.TEST_TARGETS }}_test.dart --debug --dart-define=FLAVOUR=${{ inputs.FLAVOUR }}
 
           pushd ios
@@ -108,4 +110,3 @@ jobs:
     with:
       job_status: ${{ needs.integration_test.result }}
       workflow: ${{ github.workflow }}
-      runs_on: ${{ inputs.runs_on }}

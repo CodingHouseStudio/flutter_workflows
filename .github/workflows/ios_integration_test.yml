@@ -64,7 +64,7 @@ jobs:
 
           flutter clean
 
-          flutter build ios integration_test/${{ inputs.TEST_TARGETS }}_test.dart --release --dart-define=FLAVOUR=${{ inputs.FLAVOUR }}
+          flutter build ios integration_test/${{ inputs.TEST_TARGETS }}_test.dart --debug --flavor ${{ inputs.FLAVOUR }} --dart-define=FLAVOUR=${{ inputs.FLAVOUR }}
 
           pushd ios
           xcodebuild build-for-testing \

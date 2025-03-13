@@ -1,0 +1,110 @@
+name: iOS Integration Test
+on:
+  workflow_call:
+    inputs:
+      flutter_channel:
+        required: false
+        type: string
+        default: "stable"
+      runs_on:
+        required: false
+        type: string
+        # Use a macOS runner for iOS builds
+        default: "macos-latest"
+      FLAVOUR:
+        required: true
+        type: string
+        default: "production"
+      TEST_TARGETS:
+        required: true
+        type: string
+        description: "Enter test name separated by commas (without _test.dart), e.g.: foo,discounts"
+
+env:
+  GITHUB_OUTPUT: ${{ github.workspace }}/.github/workflows/output.txt
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  integration_test:
+    name: 🧪 Run iOS Integration Tests
+    timeout-minutes: 60
+    runs-on: ${{ inputs.runs_on }}
+    environment: ${{ inputs.FLAVOUR }}
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🎯 Setup Flutter
+        uses: subosito/flutter-action@v2.12.0
+        with:
+          channel: ${{ inputs.flutter_channel }}
+          cache: true
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
+          cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:"
+          architecture: x64
+          flutter-version: ${{ vars.FLUTTER_FRAMEWORK_VERSION }}
+
+      - name: 📦 Flutter Pub Get
+        run: flutter pub get
+
+      - name: 🧹 Flutter Clean
+        run: flutter clean
+
+      - name: 🔨 Build iOS Integration Test App
+        run: |
+          flutter build ios integration_test/${{ inputs.TEST_TARGETS }}_test.dart --release --dart-define=FLAVOUR=${{ inputs.FLAVOUR }}
+
+      - name: 🛠 Xcode Build for Testing
+        run: |
+          output="../build/ios_integ"
+          product="build/ios_integ/Build/Products"
+          mkdir -p $output
+          pushd ios
+          xcodebuild build-for-testing \
+            -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -xcconfig Flutter/Release.xcconfig \
+            -configuration Release \
+            -derivedDataPath $output \
+            -sdk iphoneos
+          popd
+
+      - name: 📦 Zip iOS Test Artifacts
+        run: |
+          product="build/ios_integ/Build/Products"
+          pushd $product
+          find . -name "Runner_*.xctestrun" -exec zip -r --must-match "ios_tests.zip" "Release-iphoneos" {} +
+          popd
+
+      - name: ☁️ Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2.1.0
+        with:
+          project_id: ${{ vars.FIREBASE_PROJECT_ID }}
+
+      - name: 🔑 Download Google Cloud Config
+        id: gcloud_config
+        uses: timheuer/base64-to-file@v1.0.3
+        with:
+          fileName: integration_test_gcloud.json
+          encodedString: ${{ secrets.INTEGRATION_TEST_GCLOUD_CONFIG }}
+
+      - name: 🚀 Upload To Firebase Test Lab (iOS)
+        run: |
+          gcloud auth activate-service-account --key-file="${{ steps.gcloud_config.outputs.filePath }}"
+          gcloud firebase test ios run \
+            --test "build/ios_integ/Build/Products/ios_tests.zip" \
+            --device model=iphone11pro,version=14.1,locale=fr_FR,orientation=portrait
+
+  notify:
+    name: 📢 Send Notification
+    if: always()
+    needs:
+      - integration_test
+    uses: ./.github/workflows/notification.yml
+    secrets: inherit
+    with:
+      job_status: ${{ needs.integration_test.result }}
+      workflow: ${{ github.workflow }}
+      runs_on: ${{ inputs.runs_on }}

@@ -62,14 +62,14 @@ jobs:
           output="../build/ios_integ"
           product="build/ios_integ/Build/Products"
 
-          flutter build ios integration_test/${{ inputs.TEST_TARGETS }}_test.dart --debug --flavor ${{ inputs.FLAVOUR }} --dart-define=FLAVOUR=${{ inputs.FLAVOUR }} --no-codesign
+          flutter build ios integration_test/${{ inputs.TEST_TARGETS }}_test.dart --release --flavor ${{ inputs.FLAVOUR }} --dart-define=FLAVOUR=${{ inputs.FLAVOUR }}
 
           pushd ios
           xcodebuild build-for-testing \
             -workspace Runner.xcworkspace \
             -scheme Runner \
             -xcconfig Flutter/Release.xcconfig \
-            -configuration Release \
+            -configuration Release-${{ inputs.FLAVOUR }} \
             -derivedDataPath \ 
             $output -sdk iphoneos
           popd

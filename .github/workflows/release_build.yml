@@ -128,10 +128,12 @@ jobs:
             exit 1
           fi
 
+          echo "Current App Version - $current_version"
+
           # Update the pubspec.yaml configuration file
           sed -i.bak "s/^[[:space:]]*auth_token:.*/  auth_token: $escaped_token/" pubspec.yaml
           
-          sed -i.bak "s/^version:.*/version: $current_version+$BUILD_NUMBER/" pubspec.yaml
+          sed -i.bak "s/^version:.*/version: $current_version+$build_number/" pubspec.yaml
 
           echo "APP_VERSION=$current_version" >> $GITHUB_ENV
       - name: 📦 Install Dependencies

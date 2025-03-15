@@ -117,14 +117,23 @@ jobs:
       - name: Update pubspec.yaml
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-
         run: |
           # Escape special characters in the token to prevent sed issues
           escaped_token=$(echo "$SENTRY_AUTH_TOKEN" | sed 's/[&/]/\\&/g')
-          echo "$SENTRY_AUTH_TOKEN"
+          
+          current_version=$(grep -E '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
+
+          if [ -z "$current_version" ]; then
+            echo "Error: Could not find the current version in pubspec.yaml"
+            exit 1
+          fi
+
           # Update the pubspec.yaml configuration file
           sed -i.bak "s/^[[:space:]]*auth_token:.*/  auth_token: $escaped_token/" pubspec.yaml
-          sed -i.bak "s/^version:.*/version: 1.0.2+$build_number/" pubspec.yaml
+          
+          sed -i.bak "s/^version:.*/version: $current_version+$BUILD_NUMBER/" pubspec.yaml
+
+          echo "APP_VERSION=$current_version" >> $GITHUB_ENV
       - name: 📦 Install Dependencies
         run: flutter config --no-analytics
       - run: flutter config --no-cli-animations
@@ -142,7 +151,14 @@ jobs:
           firebase_app_check: ${{ secrets.FIREBASE_APP_CHECK }}
           firebase_vapid_key: ${{ secrets.FIREBASE_VAPID_KEY }}
         run: |
-          flutter build web --release -t lib/main_${{inputs.FLAVOUR}}.dart --wasm --build-name=1.0.2 --build-number=${{inputs.build_number}} --dart-define=FLAVOUR=${{inputs.FLAVOUR}} --dart-define=ROLE=${{inputs.ROLE}} --dart-define=SENTRY_DSN=${{env.sentry_dsn}} --dart-define=FIREBASE_APP_CHECK=${{env.firebase_app_check}} --dart-define=FIREBASE_VAPID_KEY=${{env.firebase_vapid_key}} --source-maps
+          flutter build web --release -t lib/main_${{inputs.FLAVOUR}}.dart --wasm \
+            --build-name=$APP_VERSION --build-number=${{inputs.build_number}} \
+            --dart-define=FLAVOUR=${{inputs.FLAVOUR}} \
+            --dart-define=ROLE=${{inputs.ROLE}} \
+            --dart-define=SENTRY_DSN=${{env.sentry_dsn}} \
+            --dart-define=FIREBASE_APP_CHECK=${{env.firebase_app_check}} \
+            --dart-define=FIREBASE_VAPID_KEY=${{env.firebase_vapid_key}} \
+            --source-maps
           mv build/web/flutter_bootstrap.js build/web/${{inputs.build_number}}.flutter_bootstrap.js
           sed "s/flutter_bootstrap.js/${{inputs.build_number}}.flutter_bootstrap.js/g" build/web/index.html >build/web/newindex.html
           mv build/web/newindex.html build/web/index.html

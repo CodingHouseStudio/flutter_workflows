@@ -44,7 +44,7 @@ jobs:
       - name: 📦 Install Dependencies
         run: npm install
       - name: Build the Web static pages
-        run: npm run build
+        run: npm run pages:build
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:

@@ -1,0 +1,64 @@
+# release_build.yaml
+name: Web Release Build
+
+# Controls when the workflow will run
+on:
+  workflow_call:
+    inputs:
+      FLAVOUR:
+        required: true
+        type: string
+        default: "production"
+      project_name:
+        required: false
+        type: string
+        default: "veteran-web-new"
+      directory:
+        required: false
+        type: string
+        default: "./.next"
+      runs_on:
+        required: false
+        type: string
+        default: "ubuntu-latest"
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
+
+jobs:
+  build:
+    runs-on: ${{inputs.runs_on}} # We are using ubuntu to deploy flutter web
+    timeout-minutes: 20
+    environment: ${{inputs.FLAVOUR}}
+    permissions: # set permissions for AWS creentials specifically
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.5
+      - name: Set Up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ vars.NODE_FRAMEWORK_VERSION }}
+      - name: 📦 Install Dependencies
+        run: npm install
+      - name: Build the Web static pages
+        run: npm run build
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{secrets.API_TOKEN}}
+          accountId: ${{secrets.ACCOUNT_ID}}
+          projectName: ${{inputs.project_name}}
+          directory: ${{inputs.directory}}
+  notify:
+    if: always() # Ensures this job runs regardless of the completion status of dependent jobs
+    needs:
+      - build
+    uses: ./.github/workflows/notification.yml
+    secrets: inherit
+    with:
+      job_status: ${{ needs.build.result }}
+      workflow: ${{ github.workflow }}
+      runs_on: ${{inputs.runs_on}}

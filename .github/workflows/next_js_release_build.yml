@@ -13,6 +13,10 @@ on:
         required: false
         type: string
         default: "ubuntu-latest"
+      new_engine:
+        required: false
+        type: string
+        default: "false"
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -35,7 +39,14 @@ jobs:
           node-version: ${{ vars.NODE_FRAMEWORK_VERSION }}
       - name: 📦 Install Dependencies
         run: npm install
-      - name: Build the Web static pages
+      # If new_engine is true, run the new command.
+      - name: Build the Web static pages (new engine)
+        if: ${{ inputs.new_engine == "true" }}
+        run: opennextjs-cloudflare
+
+      # Otherwise, run the legacy build command.
+      - name: Build the Web static pages (legacy)
+        if: ${{ inputs.new_engine != 'true' }}
         run: npm run pages:build
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3

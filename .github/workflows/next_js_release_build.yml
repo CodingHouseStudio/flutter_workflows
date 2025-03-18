@@ -40,9 +40,9 @@ jobs:
       - name: 📦 Install Dependencies
         run: npm install
        # If new_engine is true, run the new command.
-      - name: Build  (new engine)
+      - name: Pre-Deploy  (new engine)
         if: ${{ inputs.new_engine == 'true' }}
-        run: npm run build
+        run: npm run pre-deploy
       # If new_engine is true, run the new command.
       - name: Build the Web static pages (new engine)
         if: ${{ inputs.new_engine == 'true' }}

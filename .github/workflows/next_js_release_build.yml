@@ -9,10 +9,6 @@ on:
         required: true
         type: string
         default: "production"
-      project_name:
-        required: false
-        type: string
-        default: "veteran-web-new"
       runs_on:
         required: false
         type: string
@@ -46,7 +42,6 @@ jobs:
         with:
           apiToken: ${{secrets.API_TOKEN}}
           accountId: ${{secrets.ACCOUNT_ID}}
-          projectName: ${{inputs.project_name}}
           command: pages deploy
           packageManager: npm
   notify:

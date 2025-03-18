@@ -38,7 +38,8 @@ jobs:
         with:
           node-version: ${{ vars.NODE_FRAMEWORK_VERSION }}
       - name: 📦 Install Dependencies
-        run: npm install
+       # npm ci instead of npm install to not overwrite package_lock.json
+        run: npm ci
        # If new_engine is true, run the new command.
       - name: Pre-Deploy  (new engine)
         if: ${{ inputs.new_engine == 'true' }}

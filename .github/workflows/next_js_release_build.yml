@@ -40,11 +40,6 @@ jobs:
       - name: 📦 Install Dependencies
        # npm ci instead of npm install to not overwrite package_lock.json
         run: npm ci
-       # If new_engine is true, run the new command.
-      - name: Pre-Deploy  (new engine)
-        if: ${{ inputs.new_engine == 'true' }}
-        run: npm run pre-deploy
-
       # Otherwise, run the legacy build command.
       - name: Build the Web static pages (legacy)
         if: ${{ inputs.new_engine != 'true' }}
@@ -64,6 +59,7 @@ jobs:
           apiToken: ${{secrets.API_TOKEN}}
           accountId: ${{secrets.ACCOUNT_ID}}
           command: deploy
+          preCommands: npm run pre-deploy
           packageManager: npm
   notify:
     if: always() # Ensures this job runs regardless of the completion status of dependent jobs

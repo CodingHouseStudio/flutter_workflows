@@ -41,7 +41,7 @@ jobs:
         run: npm install
       # If new_engine is true, run the new command.
       - name: Build the Web static pages (new engine)
-        if: ${{ inputs.new_engine == "true" }}
+        if: ${{ inputs.new_engine == 'true' }}
         run: opennextjs-cloudflare
 
       # Otherwise, run the legacy build command.

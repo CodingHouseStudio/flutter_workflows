@@ -39,6 +39,10 @@ jobs:
           node-version: ${{ vars.NODE_FRAMEWORK_VERSION }}
       - name: 📦 Install Dependencies
         run: npm install
+       # If new_engine is true, run the new command.
+      - name: Build  (new engine)
+        if: ${{ inputs.new_engine == 'true' }}
+        run: npm run build
       # If new_engine is true, run the new command.
       - name: Build the Web static pages (new engine)
         if: ${{ inputs.new_engine == 'true' }}

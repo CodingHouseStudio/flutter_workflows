@@ -49,12 +49,21 @@ jobs:
       - name: Build the Web static pages (legacy)
         if: ${{ inputs.new_engine != 'true' }}
         run: npm run pages:build
-      - name: Deploy to Cloudflare Pages
+      - name: Deploy to Cloudflare Pages (legacy)
+        if: ${{ inputs.new_engine != 'true' }}
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{secrets.API_TOKEN}}
           accountId: ${{secrets.ACCOUNT_ID}}
           command: pages deploy
+          packageManager: npm
+      - name: Deploy to Cloudflare Pages (new)
+        if: ${{ inputs.new_engine == 'true' }}
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{secrets.API_TOKEN}}
+          accountId: ${{secrets.ACCOUNT_ID}}
+          command: deploy
           packageManager: npm
   notify:
     if: always() # Ensures this job runs regardless of the completion status of dependent jobs

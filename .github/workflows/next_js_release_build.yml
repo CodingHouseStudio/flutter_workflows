@@ -39,7 +39,10 @@ jobs:
           node-version: ${{ vars.NODE_FRAMEWORK_VERSION }}
       - name: 📦 Install Dependencies
        # npm ci instead of npm install to not overwrite package_lock.json
-        run: npm install
+        with:
+          apiToken: ${{secrets.API_TOKEN}}
+          accountId: ${{secrets.ACCOUNT_ID}}
+        run: npm install && npm run dep
       # Otherwise, run the legacy build command.
       - name: Build the Web static pages (legacy)
         if: ${{ inputs.new_engine != 'true' }}

@@ -16,7 +16,7 @@ on:
       new_engine:
         required: false
         type: string
-        default: "false"
+        default: "true"
 
 permissions:
   id-token: write # This is required for requesting the JWT

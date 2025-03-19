@@ -39,10 +39,7 @@ jobs:
           node-version: ${{ vars.NODE_FRAMEWORK_VERSION }}
       - name: 📦 Install Dependencies
        # npm ci instead of npm install to not overwrite package_lock.json
-        run: npm install && npm run deploy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{secrets.API_TOKEN}}
-          accountId: ${{secrets.ACCOUNT_ID}}
+        run: npm install
       # Otherwise, run the legacy build command.
       - name: Build the Web static pages (legacy)
         if: ${{ inputs.new_engine != 'true' }}
@@ -59,8 +56,8 @@ jobs:
         if: ${{ inputs.new_engine == 'true' }}
         uses: cloudflare/wrangler-action@v3
         with:
-          apiToken: ${{secrets.API_TOKEN}}
-          accountId: ${{secrets.ACCOUNT_ID}}
+          apiToken: ${{secrets.CLOUDFLARE_API_TOKEN}}
+          accountId: ${{secrets.CLOUDFLARE_ACCOUNT_ID}}
           command: deploy
           preCommands: npm run pre-deploy
           packageManager: npm

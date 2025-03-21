@@ -61,17 +61,6 @@ jobs:
         run: |
           echo "Setting Cloudflare Workers Variables..."
           npx wrangler vars set TEST ${{ secrets.TEST_SECRET }}
-
-      - name: Set Cloudflare Workers Variables
-        run: |
-          echo "Setting Cloudflare Workers Variables..."
-          secrets_array=$(echo '${{ inputs.secrets_list }}' | jq -c '.[]')
-          for secret in $secrets_array; do
-            key=$(echo $secret | tr -d '"')
-            value="${{ secrets[key] }}"
-            echo "Setting $key..."
-            npx wrangler vars set "$key" "$value"
-          done
           
       - name: Deploy to Cloudflare Pages (new)
         if: ${{ inputs.new_engine == 'true' }}

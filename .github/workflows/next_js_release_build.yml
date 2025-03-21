@@ -17,6 +17,10 @@ on:
         required: false
         type: string
         default: "true"
+      secrets_list:
+        required: false
+        type: string
+        default: '[]'
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -52,6 +56,23 @@ jobs:
           accountId: ${{secrets.CLOUDFLARE_ACCOUNT_ID}}
           command: pages deploy
           packageManager: npm
+      - name: Set Cloudflare Workers Variables
+        if: ${{ inputs.new_engine == 'true' }}
+        run: |
+          echo "Setting Cloudflare Workers Variables..."
+          npx wrangler vars set TEST ${{ secrets.TEST_SECRET }}
+
+      - name: Set Cloudflare Workers Variables
+        run: |
+          echo "Setting Cloudflare Workers Variables..."
+          secrets_array=$(echo '${{ inputs.secrets_list }}' | jq -c '.[]')
+          for secret in $secrets_array; do
+            key=$(echo $secret | tr -d '"')
+            value="${{ secrets[key] }}"
+            echo "Setting $key..."
+            npx wrangler vars set "$key" "$value"
+          done
+          
       - name: Deploy to Cloudflare Pages (new)
         if: ${{ inputs.new_engine == 'true' }}
         uses: cloudflare/wrangler-action@v3
@@ -61,6 +82,9 @@ jobs:
           command: deploy
           preCommands: npm run pre-deploy
           packageManager: npm
+        env:
+          NEXT_PUBLIC_FIREBASE_CONFIG: ${{ secrets.NEXT_PUBLIC_FIREBASE_CONFIG }}
+          NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY: ${{ secrets.NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY }}
   notify:
     if: always() # Ensures this job runs regardless of the completion status of dependent jobs
     needs:

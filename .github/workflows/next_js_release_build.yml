@@ -56,11 +56,6 @@ jobs:
           accountId: ${{secrets.CLOUDFLARE_ACCOUNT_ID}}
           command: pages deploy
           packageManager: npm
-      - name: Set Cloudflare Workers Variables
-        if: ${{ inputs.new_engine == 'true' }}
-        run: |
-          echo "Setting Cloudflare Workers Variables..."
-          npx wrangler vars set TEST ${{ secrets.TEST_SECRET }}
           
       - name: Deploy to Cloudflare Pages (new)
         if: ${{ inputs.new_engine == 'true' }}

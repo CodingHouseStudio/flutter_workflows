@@ -76,8 +76,10 @@ jobs:
             TOTAL_SIZE_MB=$((TOTAL_SIZE_KB / 1024))
             echo "Total build size: ${TOTAL_SIZE_MB}MB"
             if [ "$TOTAL_SIZE_MB" -gt "$MAX_SIZE_MB" ]; then
-              echo "🚨 Build size exceeds ${MAX_SIZE_MB}MB limit! Stopping deployment."
+              echo "🚨❌ Build size exceeds ${MAX_SIZE_MB}MB limit! Stopping deployment."
               exit 1
+            else
+              echo "✅ Build size exceeds less then ${MAX_SIZE_MB}MB limit."
             fi
           packageManager: npm
           environment: ${{ inputs.FLAVOUR != 'production' && inputs.FLAVOUR || '' }}

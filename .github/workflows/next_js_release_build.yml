@@ -68,10 +68,8 @@ jobs:
           apiToken: ${{secrets.CLOUDFLARE_API_TOKEN}}
           accountId: ${{secrets.CLOUDFLARE_ACCOUNT_ID}}
           command: deploy
-          preCommands: npm run pre-deploy
-          packageManager: npm
-          environment: ${{ inputs.FLAVOUR != 'production' && inputs.FLAVOUR || '' }}
           preCommands: |
+            npm run pre-deploy
             TARGET_DIR="dist"
             MAX_SIZE_MB=${{ inputs.folder_max_mb_size }}
             TOTAL_SIZE_KB=$(du -sk $TARGET_DIR | cut -f1)
@@ -81,6 +79,8 @@ jobs:
               echo "🚨 Build size exceeds ${MAX_SIZE_MB}MB limit! Stopping deployment."
               exit 1
             fi
+          packageManager: npm
+          environment: ${{ inputs.FLAVOUR != 'production' && inputs.FLAVOUR || '' }}
         env:
           NEXT_PUBLIC_FIREBASE_CONFIG: ${{ secrets.NEXT_PUBLIC_FIREBASE_CONFIG }}
           NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY: ${{ secrets.NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY }}

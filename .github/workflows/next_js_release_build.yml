@@ -21,6 +21,10 @@ on:
         required: false
         type: string
         default: '[]'
+      worker_name:
+        required: false
+        type: string
+        default: ""
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -66,6 +70,8 @@ jobs:
           command: deploy
           preCommands: npm run pre-deploy
           packageManager: npm
+          projectName: ${{inputs.project_name}}
+          environment: ${{inputs.FLAVOUR}}
         env:
           NEXT_PUBLIC_FIREBASE_CONFIG: ${{ secrets.NEXT_PUBLIC_FIREBASE_CONFIG }}
           NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY: ${{ secrets.NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY }}

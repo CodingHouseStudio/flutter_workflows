@@ -70,7 +70,7 @@ jobs:
           command: deploy
           preCommands: npm run pre-deploy
           packageManager: npm
-          projectName: ${{inputs.project_name}}
+          projectName: ${{inputs.projectName}}
           environment: ${{inputs.FLAVOUR}}
         env:
           NEXT_PUBLIC_FIREBASE_CONFIG: ${{ secrets.NEXT_PUBLIC_FIREBASE_CONFIG }}

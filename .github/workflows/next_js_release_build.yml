@@ -60,6 +60,29 @@ jobs:
           accountId: ${{secrets.CLOUDFLARE_ACCOUNT_ID}}
           command: pages deploy
           packageManager: npm
+
+      - name: Check size
+        if: ${{ inputs.new_engine == 'true' }}
+        env:
+          MAX_SIZE_MB: ${{ inputs.folder_max_mb_size }}
+        run: |
+          # Run the check-size script defined in package.json
+          npm run check-size
+
+          # Calculate the size of the output directory in MB
+          BUNDLE_SIZE=$(du -sm boundled | cut -f1)
+          echo "Total build size: ${BUNDLE_SIZE} MB"
+
+          # Ensure MAX_SIZE_MB is set (default to 3MB if empty)
+          MAX_SIZE_MB=${MAX_SIZE_MB:-3}
+
+          # If the bundle size exceeds the limit, stop the workflow
+          if [ "$BUNDLE_SIZE" -gt "$MAX_SIZE_MB" ]; then
+            echo "🚨❌ Build size exceeds ${MAX_SIZE_MB}MB limit! Stopping deployment."
+            exit 1
+          else
+            echo "✅ Build size is within the ${MAX_SIZE_MB}MB limit."
+          fi
           
       - name: Deploy to Cloudflare Pages (new)
         if: ${{ inputs.new_engine == 'true' }}
@@ -68,21 +91,9 @@ jobs:
           apiToken: ${{secrets.CLOUDFLARE_API_TOKEN}}
           accountId: ${{secrets.CLOUDFLARE_ACCOUNT_ID}}
           command: deploy
-          preCommands: |
-            npm run pre-deploy
-            TARGET_DIR="dist"
-            MAX_SIZE_MB=${{ inputs.folder_max_mb_size }}
-            TOTAL_SIZE_KB=$(du -sk $TARGET_DIR | cut -f1)
-            TOTAL_SIZE_MB=$((TOTAL_SIZE_KB / 1024))
-            echo "Total build size: ${TOTAL_SIZE_MB}MB"
-            if [ "$TOTAL_SIZE_MB" -gt "$MAX_SIZE_MB" ]; then
-              echo "🚨❌ Build size exceeds ${MAX_SIZE_MB}MB limit! Stopping deployment."
-              exit 1
-            else
-              echo "✅ Build size exceeds less then ${MAX_SIZE_MB}MB limit."
-            fi
           packageManager: npm
           environment: ${{ inputs.FLAVOUR != 'production' && inputs.FLAVOUR || '' }}
+          preCommands: npm run pre-deploy
         env:
           NEXT_PUBLIC_FIREBASE_CONFIG: ${{ secrets.NEXT_PUBLIC_FIREBASE_CONFIG }}
           NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY: ${{ secrets.NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY }}

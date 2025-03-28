@@ -70,6 +70,7 @@ jobs:
         env:
           NEXT_PUBLIC_FIREBASE_CONFIG: ${{ secrets.NEXT_PUBLIC_FIREBASE_CONFIG }}
           NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY: ${{ secrets.NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY }}
+          FLAVOUR: ${{ inputs.FLAVOUR }}
   notify:
     if: always() # Ensures this job runs regardless of the completion status of dependent jobs
     needs:

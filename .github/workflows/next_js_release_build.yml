@@ -21,6 +21,10 @@ on:
         required: false
         type: string
         default: '[]'
+      folder_max_mb_size:
+        required: false
+        type: number
+        default: 3
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -67,6 +71,16 @@ jobs:
           preCommands: npm run pre-deploy
           packageManager: npm
           environment: ${{ inputs.FLAVOUR != 'production' && inputs.FLAVOUR || '' }}
+          preCommands: |
+            TARGET_DIR="dist"
+            MAX_SIZE_MB=${{ inputs.folder_max_mb_size }}
+            TOTAL_SIZE_KB=$(du -sk $TARGET_DIR | cut -f1)
+            TOTAL_SIZE_MB=$((TOTAL_SIZE_KB / 1024))
+            echo "Total build size: ${TOTAL_SIZE_MB}MB"
+            if [ "$TOTAL_SIZE_MB" -gt "$MAX_SIZE_MB" ]; then
+              echo "🚨 Build size exceeds ${MAX_SIZE_MB}MB limit! Stopping deployment."
+              exit 1
+            fi
         env:
           NEXT_PUBLIC_FIREBASE_CONFIG: ${{ secrets.NEXT_PUBLIC_FIREBASE_CONFIG }}
           NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY: ${{ secrets.NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY }}

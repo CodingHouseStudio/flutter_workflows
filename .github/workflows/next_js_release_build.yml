@@ -21,10 +21,10 @@ on:
         required: false
         type: string
         default: '[]'
-      worker_name:
+      projectName:
         required: false
         type: string
-        default: ""
+        default: "veteran-web-new-development"
 
 permissions:
   id-token: write # This is required for requesting the JWT

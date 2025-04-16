@@ -77,6 +77,8 @@ jobs:
           NEXT_PUBLIC_FLAVOUR: ${{ inputs.FLAVOUR }}
           NEXT_PUBLIC_TYPESENSE_HOST: ${{ secrets.NEXT_PUBLIC_TYPESENSE_HOST }}
           NEXT_PUBLIC_TYPESENSE_API_KEY: ${{ secrets.NEXT_PUBLIC_TYPESENSE_API_KEY }}
+          NEXT_PUBLIC_ALGOLIA_APP_ID: ${{ secrets.NEXT_PUBLIC_ALGOLIA_APP_ID }}
+          NEXT_PUBLIC_ALGOLIA_API_KEY: ${{ secrets.NEXT_PUBLIC_ALGOLIA_API_KEY }}
   notify:
     if: always() # Ensures this job runs regardless of the completion status of dependent jobs
     needs:

@@ -1,4 +1,4 @@
-# next_js_release_build.yml
+# release_build.yaml
 name: Web Release Build
 
 # Controls when the workflow will run
@@ -25,10 +25,6 @@ on:
         required: false
         type: number
         default: 3
-      env_vars:
-        required: false
-        type: string
-        default: '{}'
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -49,25 +45,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ vars.NODE_FRAMEWORK_VERSION }}
-
-
-      - name: Set dynamic environment variables
-        run: |
-          
-          echo "NEXT_PUBLIC_FLAVOUR=${{ inputs.FLAVOUR }}" >> $GITHUB_ENV
-
-          dynamic_env_vars_json='${{ inputs.env_vars }}'
-          
-          if ! command -v jq &> /dev/null; then
-              echo "jq not found, installing..."
-              sudo apt-get update && sudo apt-get install -y jq
-          fi
-
-          echo "$dynamic_env_vars_json" | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
-
-          echo "Dynamic environment variables set:"
-          cat $GITHUB_ENV 
-
       - name: 📦 Install Dependencies
        # npm ci instead of npm install to not overwrite package_lock.json
         run: npm install
@@ -94,13 +71,15 @@ jobs:
           packageManager: npm
           environment: ${{ inputs.FLAVOUR != 'production' && inputs.FLAVOUR || '' }}
           preCommands: npm run pre-deploy && chmod +x ./check_app_size.sh && ./check_app_size.sh
-        # env:
-          # NEXT_PUBLIC_FLAVOUR: ${{ inputs.FLAVOUR }}
-          # NEXT_PUBLIC_FLAVOUR: ${{ inputs.FLAVOUR }}
-          # NEXT_PUBLIC_FIREBASE_CONFIG: ${{ secrets.NEXT_PUBLIC_FIREBASE_CONFIG }}
-          # NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY: ${{ secrets.NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY }}
-          # NEXT_PUBLIC_ALGOLIA_APP_ID: ${{ secrets.NEXT_PUBLIC_ALGOLIA_APP_ID }}
-          # NEXT_PUBLIC_ALGOLIA_API_KEY: ${{ secrets.NEXT_PUBLIC_ALGOLIA_API_KEY }}
+        env:
+          NEXT_PUBLIC_FIREBASE_CONFIG: ${{ secrets.NEXT_PUBLIC_FIREBASE_CONFIG }}
+          NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY: ${{ secrets.NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY }}
+          NEXT_PUBLIC_FLAVOUR: ${{ inputs.FLAVOUR }}
+          NEXT_PUBLIC_ALGOLIA_APP_ID: ${{ secrets.NEXT_PUBLIC_ALGOLIA_APP_ID }}
+          NEXT_PUBLIC_ALGOLIA_API_KEY: ${{ secrets.NEXT_PUBLIC_ALGOLIA_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
   notify:
     if: always() # Ensures this job runs regardless of the completion status of dependent jobs
     needs:

@@ -25,6 +25,10 @@ on:
         required: false
         type: number
         default: 3
+      env_vars:
+        required: false
+        type: string
+        default: '{}'
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -72,11 +76,13 @@ jobs:
           environment: ${{ inputs.FLAVOUR != 'production' && inputs.FLAVOUR || '' }}
           preCommands: npm run pre-deploy && chmod +x ./check_app_size.sh && ./check_app_size.sh
         env:
-          NEXT_PUBLIC_FIREBASE_CONFIG: ${{ secrets.NEXT_PUBLIC_FIREBASE_CONFIG }}
-          NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY: ${{ secrets.NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY }}
+          ${{ fromJson(inputs.env_vars) }}
           NEXT_PUBLIC_FLAVOUR: ${{ inputs.FLAVOUR }}
-          NEXT_PUBLIC_ALGOLIA_APP_ID: ${{ secrets.NEXT_PUBLIC_ALGOLIA_APP_ID }}
-          NEXT_PUBLIC_ALGOLIA_API_KEY: ${{ secrets.NEXT_PUBLIC_ALGOLIA_API_KEY }}
+          # NEXT_PUBLIC_FLAVOUR: ${{ inputs.FLAVOUR }}
+          # NEXT_PUBLIC_FIREBASE_CONFIG: ${{ secrets.NEXT_PUBLIC_FIREBASE_CONFIG }}
+          # NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY: ${{ secrets.NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY }}
+          # NEXT_PUBLIC_ALGOLIA_APP_ID: ${{ secrets.NEXT_PUBLIC_ALGOLIA_APP_ID }}
+          # NEXT_PUBLIC_ALGOLIA_API_KEY: ${{ secrets.NEXT_PUBLIC_ALGOLIA_API_KEY }}
   notify:
     if: always() # Ensures this job runs regardless of the completion status of dependent jobs
     needs:

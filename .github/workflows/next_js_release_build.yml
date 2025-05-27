@@ -53,63 +53,20 @@ jobs:
 
       - name: Set dynamic environment variables
         run: |
-          # Parse env_vars JSON input
-          dynamic_env_vars='${{ inputs.env_vars }}'
           
-          # Add NEXT_PUBLIC_FLAVOUR dynamically
           echo "NEXT_PUBLIC_FLAVOUR=${{ inputs.FLAVOUR }}" >> $GITHUB_ENV
 
-          # Loop through dynamic_env_vars and set them
-          # Using `jq` to parse JSON and iterate
-          # Install jq if not present (usually pre-installed on ubuntu-latest)
-          # sudo apt-get update && sudo apt-get install -y jq
-          if command -v jq &> /dev/null; then
-            echo "$dynamic_env_vars" | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
-          else
-            echo "jq is not installed. Cannot dynamically set all env_vars from JSON. Please install jq or adjust the script."
-            # Fallback for systems without jq (less robust for complex JSON)
-            # You might need to parse it differently, e.g., with Python or Node.js
-            # For simple key-value pairs, you could use string manipulation, but not recommended for general JSON.
-            # Example for very simple JSON:
-            # echo "$dynamic_env_vars" | sed -e 's/[{}"]//g' -e 's/,/\n/g' -e 's/: /=/g' >> $GITHUB_ENV
+          dynamic_env_vars_json='${{ inputs.env_vars }}'
+          
+          if ! command -v jq &> /dev/null; then
+              echo "jq not found, installing..."
+              sudo apt-get update && sudo apt-get install -y jq
           fi
 
-          # Dynamically add secrets from secrets_list if they exist
-          # Note: Accessing secrets dynamically by name can be tricky and requires careful handling
-          # because GitHub Actions does not allow dynamic access to `secrets.<dynamic_name>` directly.
-          # You would need to map them to environment variables in a script or use a custom action.
-          # A safer way is to explicitly list them if possible, or use a custom script as below:
-          
-          secrets_json_array='${{ inputs.secrets_list }}'
-          if [ "$secrets_json_array" != "[]" ]; then
-            echo "$secrets_json_array" | jq -r '.[]' | while read -r secret_name; do
-              # IMPORTANT: Directly accessing secrets by dynamic name like ${{ secrets[secret_name] }} is NOT supported.
-              # You must pass them explicitly if they are fixed.
-              # If you truly need dynamic secrets, you would need to retrieve them from a secret store
-              # or have a predefined mapping of secret names to their values in a separate, secure step.
-              # For demonstration, let's assume `secrets` context allows some form of lookup if implemented
-              # or you're mapping them to predefined env vars.
-              # This part needs adjustment based on how your secrets are actually named and what needs to be exposed.
-              
-              # Example: if you have secrets like NEXT_PUBLIC_FIREBASE_CONFIG, NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY etc.
-              # and want to expose them as env vars if their names are in secrets_list
-              case "$secret_name" in
-                "NEXT_PUBLIC_FIREBASE_CONFIG")
-                  echo "NEXT_PUBLIC_FIREBASE_CONFIG=${{ secrets.NEXT_PUBLIC_FIREBASE_CONFIG }}" >> $GITHUB_ENV
-                  ;;
-                "NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY")
-                  echo "NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY=${{ secrets.NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY }}" >> $GITHUB_ENV
-                  ;;
-                # Add more cases for other secrets you want to dynamically expose
-                # from the secrets context, based on the `secrets_list` input.
-                # WARNING: Be extremely careful with exposing secrets. They will be masked in logs,
-                # but if the values are used in other ways, they could be exposed.
-                *)
-                  echo "Warning: Secret '$secret_name' not explicitly handled for dynamic exposure."
-                  ;;
-              esac
-            done
-          fi
+          echo "$dynamic_env_vars_json" | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
+
+          echo "Dynamic environment variables set:"
+          cat $GITHUB_ENV 
 
       - name: 📦 Install Dependencies
        # npm ci instead of npm install to not overwrite package_lock.json

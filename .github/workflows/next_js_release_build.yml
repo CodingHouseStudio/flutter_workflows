@@ -137,9 +137,8 @@ jobs:
           packageManager: npm
           environment: ${{ inputs.FLAVOUR != 'production' && inputs.FLAVOUR || '' }}
           preCommands: npm run pre-deploy && chmod +x ./check_app_size.sh && ./check_app_size.sh
-        env:
-          ${{ fromJson(inputs.env_vars) }}
-          NEXT_PUBLIC_FLAVOUR: ${{ inputs.FLAVOUR }}
+        # env:
+          # NEXT_PUBLIC_FLAVOUR: ${{ inputs.FLAVOUR }}
           # NEXT_PUBLIC_FLAVOUR: ${{ inputs.FLAVOUR }}
           # NEXT_PUBLIC_FIREBASE_CONFIG: ${{ secrets.NEXT_PUBLIC_FIREBASE_CONFIG }}
           # NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY: ${{ secrets.NEXT_PUBLIC_RECAPTCHA_V3_SITE_KEY }}

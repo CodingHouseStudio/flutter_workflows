@@ -172,7 +172,7 @@ jobs:
         if: ${{inputs.run_sentry_plugin}}
         run: flutter packages pub run sentry_dart_plugin
       - name: Deploy to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{secrets.API_TOKEN}}
           accountId: ${{secrets.ACCOUNT_ID}}

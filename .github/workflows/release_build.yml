@@ -112,6 +112,11 @@ jobs:
           cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:" # optional, change this to specify the cache path
           architecture: x64 # optional, x64 or arm64
           flutter-version: ${{ vars.FLUTTER_FRAMEWORK_VERSION }}
+      # Neccessary for wrangler action
+      - name: Set Up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ vars.NODE_FRAMEWORK_VERSION }}
         # - name: Set Version
         #   id: set_version
 

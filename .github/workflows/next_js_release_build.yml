@@ -79,6 +79,7 @@ jobs:
           NEXT_PUBLIC_ALGOLIA_API_KEY: ${{ secrets.NEXT_PUBLIC_ALGOLIA_API_KEY }}
           NEXT_PUBLIC_TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           NEXT_PUBLIC_TELEGRAM_SEND_CHAT_ID: ${{ secrets.TELEGRAM_SEND_CHAT_ID }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
   notify:
     if: always() # Ensures this job runs regardless of the completion status of dependent jobs

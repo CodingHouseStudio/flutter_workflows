@@ -1,0 +1,41 @@
+name: Update Firebase Config to Cloudflare KV
+
+on:
+  workflow_call:
+    inputs:
+      FLAVOUR:
+        required: true
+        type: string
+      runs_on:
+        required: false
+        type: string
+        default: "ubuntu-latest"
+
+jobs:
+  update-config:
+    runs-on: ${{inputs.runs_on}} # We are using ubuntu to deploy flutter web
+    timeout-minutes: 10
+    environment: ${{inputs.FLAVOUR}} 
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ vars.NODE_FRAMEWORK_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          cd .github/scripts
+          npm install
+
+      - name: Run script
+        env:
+          FIREBASE_ADMIN_CREDENTIAL: ${{ secrets.FIREBASE_ADMIN_CREDENTIAL }}
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_NAMESPACE_ID: ${{ secrets.CF_FIREBASE_REMOTE_CONFIG_NAMESPACE_ID }}
+        run: |
+          cd .github/scripts
+          node sync_firebase_remote_config.js

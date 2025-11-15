@@ -111,6 +111,7 @@ jobs:
         run: ${{inputs.setup}}
 
       - name: ✨ Check Formatting
+        if: ${{ inputs.min_coverage > 0 }}
         run: |
           exclude_patterns="${{ inputs.format_exclude }}"
           find_cmd="find lib test -name '*.dart'"
@@ -122,9 +123,11 @@ jobs:
         run: flutter analyze ${{inputs.analyze_directories}}
 
       - name: 🧪 Run Tests
+        if: ${{ inputs.min_coverage > 0 }}
         run: very_good test -j ${{inputs.concurrency}} ${{(inputs.test_recursion && '--recursive') || ''}} ${{(inputs.test_optimization && '--optimization') || '--no-optimization'}} --coverage --test-randomize-ordering-seed random
 
       - name: 📊 Check Code Coverage
+        if: ${{ inputs.min_coverage > 0 }}
         uses: VeryGoodOpenSource/very_good_coverage@v3
         with:
           path: ${{inputs.working_directory}}/coverage/lcov.info

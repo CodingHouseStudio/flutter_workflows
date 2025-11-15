@@ -106,12 +106,15 @@ jobs:
         run: ${{inputs.setup}}
 
       - name: 🧪 Run Tests
+        if: ${{ inputs.min_coverage > 0 }}
         run: very_good test -j ${{inputs.concurrency}} ${{(inputs.test_recursion && '--recursive') || ''}} ${{(inputs.test_optimization && '--optimization') || '--no-optimization'}} --coverage --test-randomize-ordering-seed random
 
       - name: Exclude coverage
+        if: ${{ inputs.min_coverage > 0 }}
         run: lcov --remove coverage/lcov.info ${{inputs.coverage_excludes}} --output-file coverage/lcov.info --ignore-errors unused
 
       - name: 📊 Check Code Coverage
+        if: ${{ inputs.min_coverage > 0 }}
         uses: VeryGoodOpenSource/very_good_coverage@v3
         with:
           path: ${{inputs.working_directory}}/coverage/lcov.info
@@ -119,6 +122,7 @@ jobs:
           min_coverage: ${{inputs.min_coverage}}
           
       - name: Upload coverage reports to Codecov
+        if: ${{ inputs.min_coverage > 0 }}
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -128,6 +132,7 @@ jobs:
           codecov_yml_path: ${{inputs.codecov_path}}
           
       - name: Extract Coverage Percentage
+        if: ${{ inputs.min_coverage > 0 }}
         id: save-code-coverage
         run: |
           COVERAGE=$(lcov --summary coverage/lcov.info | awk '/lines/ {print $2}' | tr -d '%')

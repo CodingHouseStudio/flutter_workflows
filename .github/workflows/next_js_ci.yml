@@ -1,5 +1,4 @@
-# release_build.yaml
-name: Next JS Build
+name: Next JS CI
 
 # Controls when the workflow will run
 on:
@@ -15,7 +14,7 @@ permissions:
   contents: read # This is required for actions/checkout
 
 jobs:
-  build:
+  ci:
     runs-on: ${{inputs.runs_on}} # We are using ubuntu to deploy flutter web
     timeout-minutes: 20
     steps:
@@ -39,10 +38,10 @@ jobs:
   notify:
     if: always() # Ensures this job runs regardless of the completion status of dependent jobs
     needs:
-      - build
+      - ci
     uses: ./.github/workflows/notification.yml
     secrets: inherit
     with:
-      job_status: ${{ needs.build.result }}
+      job_status: ${{ needs.ci.result }}
       workflow: ${{ github.workflow }}
       runs_on: ${{inputs.runs_on}}

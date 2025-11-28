@@ -108,14 +108,6 @@ jobs:
           done <<< "${{ inputs.secrets_map }}" # <-- The key change is here
         shell: bash
 
-      - name: Set Build Number
-        run: |
-          BUILD_NUMBER=$(date +%s)
-
-          mkdir -p public
-          echo "{\"BUILD_ID\": \"$BUILD_NUMBER\"}" > "public/config.json"
-        shell: bash
-
       - name: Deploy
         uses: cloudflare/wrangler-action@v3
         with:

@@ -1,0 +1,53 @@
+# release_build.yaml
+name: Next JS Build
+
+# Controls when the workflow will run
+on:
+  workflow_call:
+    inputs:
+      FLAVOUR:
+        required: true
+        type: string
+        default: "production"
+      runs_on:
+        required: false
+        type: string
+        default: "ubuntu-latest"
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
+
+jobs:
+  build:
+    runs-on: ${{inputs.runs_on}} # We are using ubuntu to deploy flutter web
+    timeout-minutes: 20
+    environment: ${{inputs.FLAVOUR}}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+
+      - name: Set Up Node.js
+        uses: actions/setup-node@main
+        with:
+          node-version: ${{ vars.NODE_FRAMEWORK_VERSION }}
+          cache: npm
+
+      - name: 📦 Install Dependencies
+        # npm ci instead of npm install to not overwrite package_lock.json
+        run: npm install
+
+      - name: 🔍 Lint & Type Check
+        run: |
+          npm run lint --if-present
+          npm run type-check --if-present
+  notify:
+    if: always() # Ensures this job runs regardless of the completion status of dependent jobs
+    needs:
+      - build
+    uses: ./.github/workflows/notification.yml
+    secrets: inherit
+    with:
+      job_status: ${{ needs.build.result }}
+      workflow: ${{ github.workflow }}
+      runs_on: ${{inputs.runs_on}}

@@ -36,15 +36,15 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          format: markdown # Enable Markdown
+          format: markdown
           message: |
             *${{ inputs.job_status == 'success' && '✅ Build Successful' || '❌ Build Failed' }}*
 
             🔹 *Repo:* `${{ github.event.repository.name }}`
-            🔹 *Branch:* `${{ github.ref_name }}`
+            🔹 *Branch:* `${{ github.head_ref || github.ref_name }}`
             🔹 *Workflow:* ${{ inputs.workflow }}
             ${{ inputs.trigger_actor != '' && format('👤 *User:* {0}', inputs.trigger_actor) || '' }}
-            ${{ inputs.pr_title != '' && format('📝 *Info:* {0}', inputs.pr_title) || '' }}
+            ${{ inputs.pr_title != '' && format('📝 *PR Title:* {0}', inputs.pr_title) || '' }}
 
             ${{ inputs.dop_text != '' && format('_{0}_', inputs.dop_text) || '' }}
 

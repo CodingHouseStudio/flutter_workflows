@@ -70,7 +70,7 @@ env:
   SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL_VETERANAM }}
 permissions:
   id-token: write # This is required for requesting the JWT
-  contents: write # This is required for actions/checkout 
+  contents: write # This is required for actions/checkout
 
 jobs:
   build:
@@ -144,6 +144,8 @@ jobs:
       workflow: ${{ github.workflow }}
       dop_text: ${{ format('Pull Request - {0}' ,inputs.pull_request)  }}
       runs_on: ${{inputs.runs_on}}
+      trigger_actor: ${{ github.actor }}
+      pr_title: ${{ github.event.pull_request.title }}
       #  build_coverage:
   #    timeout-minutes: 30
   #    defaults:
@@ -337,7 +339,7 @@ jobs:
   #       id: job-status
   #       run:
   #         | # && (needs.integration-web-chrome.result == 'success' || needs.integration-web-chrome.result == 'skipped')
-  #         if ${{ needs.build.result == 'success'  }}; then 
+  #         if ${{ needs.build.result == 'success'  }}; then
   #           echo "::set-output name=job-status::success"
   #         else
   #           echo "::set-output name=job-status::failure"

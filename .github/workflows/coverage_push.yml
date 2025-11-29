@@ -5,7 +5,7 @@ env:
   SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL_VETERANAM }}
 permissions:
   id-token: write # This is required for requesting the JWT
-  contents: write # This is required for actions/checkout 
+  contents: write # This is required for actions/checkout
 
 on:
   workflow_call:
@@ -65,7 +65,7 @@ jobs:
   build:
     timeout-minutes: 30
     outputs:
-       COVERAGE: ${{ steps.save-code-coverage.outputs.COVERAGE }}
+      COVERAGE: ${{ steps.save-code-coverage.outputs.COVERAGE }}
     environment: "production"
     defaults:
       run:
@@ -120,7 +120,7 @@ jobs:
           path: ${{inputs.working_directory}}/coverage/lcov.info
           exclude: ${{inputs.coverage_excludes}}
           min_coverage: ${{inputs.min_coverage}}
-          
+
       - name: Upload coverage reports to Codecov
         if: ${{ inputs.min_coverage > 0 }}
         uses: codecov/codecov-action@v5
@@ -130,7 +130,7 @@ jobs:
           fail_ci_if_error: true
           verbose: true
           codecov_yml_path: ${{inputs.codecov_path}}
-          
+
       - name: Extract Coverage Percentage
         if: ${{ inputs.min_coverage > 0 }}
         id: save-code-coverage
@@ -149,3 +149,5 @@ jobs:
       workflow: ${{ github.workflow }}
       dop_text: ${{ format('Coverage - {0}%', needs.build.outputs.COVERAGE) }}
       runs_on: ${{inputs.runs_on}}
+      trigger_actor: ${{ github.actor }}
+      pr_title: ${{ github.event.pull_request.title }}

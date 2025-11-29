@@ -31,33 +31,21 @@ jobs:
     timeout-minutes: 3
     runs-on: ${{ inputs.runs_on }}
     steps:
-      - name: Notify on Success
-        if: ${{ inputs.job_status == 'success' }}
+      - name: Send Telegram Notification
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          # Використовуємо | для багаторядкового тексту
+          format: markdown # Enable Markdown
           message: |
-            ${{ format('✅ Build successful for {0} in repository {1}.{2}{3}{4}', 
-              inputs.workflow, 
-              github.event.repository.name, 
-              inputs.trigger_actor != '' && format('%0A👤 User: {0}', inputs.trigger_actor) || '', 
-              inputs.pr_title != '' && format('%0A📝 Info: {0}', inputs.pr_title) || '', 
-              inputs.dop_text != '' && format('%0A-------- {0}', inputs.dop_text) || ''
-            ) }}
+            *${{ inputs.job_status == 'success' && '✅ Build Successful' || '❌ Build Failed' }}*
 
-      - name: Notify on Failure
-        if: ${{ inputs.job_status == 'failure' }}
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.TELEGRAM_CHAT_ID }}
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          message: |
-            ${{ format('❌ Build failed for {0} in repository {1}.{2}{3}{4}', 
-              inputs.workflow, 
-              github.event.repository.name, 
-              inputs.trigger_actor != '' && format('%0A👤 User: {0}', inputs.trigger_actor) || '', 
-              inputs.pr_title != '' && format('%0A📝 Info: {0}', inputs.pr_title) || '', 
-              inputs.dop_text != '' && format('%0A-------- {0}', inputs.dop_text) || ''
-            ) }}
+            🔹 *Repo:* `${{ github.event.repository.name }}`
+            🔹 *Branch:* `${{ github.ref_name }}`
+            🔹 *Workflow:* ${{ inputs.workflow }}
+            ${{ inputs.trigger_actor != '' && format('👤 *User:* {0}', inputs.trigger_actor) || '' }}
+            ${{ inputs.pr_title != '' && format('📝 *Info:* {0}', inputs.pr_title) || '' }}
+
+            ${{ inputs.dop_text != '' && format('_{0}_', inputs.dop_text) || '' }}
+
+            [🔗 View Run Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})

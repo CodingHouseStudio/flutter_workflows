@@ -129,7 +129,7 @@ jobs:
         run: |
           # Escape special characters in the token to prevent sed issues
           escaped_token=$(echo "$SENTRY_AUTH_TOKEN" | sed 's/[&/]/\\&/g')
-          
+
           current_version=$(grep -E '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
 
           if [ -z "$current_version" ]; then
@@ -141,7 +141,7 @@ jobs:
 
           # Update the pubspec.yaml configuration file
           sed -i.bak "s/^[[:space:]]*auth_token:.*/  auth_token: $escaped_token/" pubspec.yaml
-          
+
           sed -i.bak "s/^version:.*/version: $current_version+$build_number/" pubspec.yaml
 
           echo "APP_VERSION=$current_version" >> $GITHUB_ENV
@@ -192,6 +192,8 @@ jobs:
       job_status: ${{ needs.build.result }}
       workflow: ${{ github.workflow }}
       runs_on: ${{inputs.runs_on}}
+      trigger_actor: ${{ github.actor }}
+      pr_title: ${{ github.event.pull_request.title }}
 #  android-build:
 #    runs-on: ubuntu-latest
 #    timeout-minutes: 30

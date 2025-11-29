@@ -31,6 +31,24 @@ jobs:
     timeout-minutes: 3
     runs-on: ${{ inputs.runs_on }}
     steps:
+      # 1. Map User and save to OUTPUT (not env)
+      - name: Map GitHub User to Telegram
+        id: map_user
+        run: |
+          GH_USER="${{ inputs.trigger_actor }}"
+
+          case "$GH_USER" in
+            "DemianKryk") TG_USER="@demiankryk" ;;
+            "AndrewKrash") TG_USER="@andriikrash" ;;
+            "mykhailokurochkinwork") TG_USER="@kurochkinmy" ;;
+            "herman-the-worm") TG_USER="@hermankravchenko" ;;
+            *) TG_USER="$GH_USER" ;;
+          esac
+
+          # Write to GITHUB_OUTPUT
+          echo "tg_user=$TG_USER" >> $GITHUB_OUTPUT
+
+      # 2. Use steps.map_user.outputs.tg_user
       - name: Send Telegram Notification
         uses: appleboy/telegram-action@master
         with:
@@ -43,7 +61,7 @@ jobs:
             🔹 *Repo:* `${{ github.event.repository.name }}`
             🔹 *Branch:* `${{ github.head_ref || github.ref_name }}`
             🔹 *Workflow:* ${{ inputs.workflow }}
-            ${{ inputs.trigger_actor != '' && format('👤 *User:* {0}', inputs.trigger_actor) || '' }}
+            ${{ inputs.trigger_actor != '' && format('👤 *User:* {0}', steps.map_user.outputs.tg_user) || '' }}
             ${{ inputs.pr_title != '' && format('📝 *PR:* {0}', inputs.pr_title) || '' }}
 
             ${{ inputs.dop_text != '' && format('_{0}_', inputs.dop_text) || '' }}

@@ -45,3 +45,5 @@ jobs:
       job_status: ${{ needs.ci.result }}
       workflow: ${{ github.workflow }}
       runs_on: ${{inputs.runs_on}}
+      trigger_actor: ${{ github.actor }}
+      pr_title: ${{ github.event.pull_request.title }}

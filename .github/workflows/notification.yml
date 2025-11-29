@@ -17,7 +17,6 @@ on:
         required: false
         type: string
         default: "ubuntu-latest"
-      # 👇 Вхідні параметри
       trigger_actor:
         required: false
         type: string
@@ -38,9 +37,15 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          # 👇 ВИПРАВЛЕНО: Використання '|' дозволяє писати складні вирази з двокрапками
+          # Використовуємо | для багаторядкового тексту
           message: |
-            ${{ format('✅ Build successful for {0} in repository {1}.{2}{3}{4}', inputs.workflow, github.event.repository.name, inputs.trigger_actor != '' && format('%0A👤 User: {0}', inputs.trigger_actor) || '', inputs.pr_title != '' && format('%0A📝 PR: {0}', inputs.pr_title) || '', inputs.dop_text != '' && format('%0A-------- {0}', inputs.dop_text) || '') }}
+            ${{ format('✅ Build successful for {0} in repository {1}.{2}{3}{4}', 
+              inputs.workflow, 
+              github.event.repository.name, 
+              inputs.trigger_actor != '' && format('%0A👤 User: {0}', inputs.trigger_actor) || '', 
+              inputs.pr_title != '' && format('%0A📝 Info: {0}', inputs.pr_title) || '', 
+              inputs.dop_text != '' && format('%0A-------- {0}', inputs.dop_text) || ''
+            ) }}
 
       - name: Notify on Failure
         if: ${{ inputs.job_status == 'failure' }}
@@ -48,6 +53,11 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          # 👇 ВИПРАВЛЕНО: Аналогічно для помилки
           message: |
-            ${{ format('❌ Build failed for {0} in repository {1}.{2}{3}{4}', inputs.workflow, github.event.repository.name, inputs.trigger_actor != '' && format('%0A👤 User: {0}', inputs.trigger_actor) || '', inputs.pr_title != '' && format('%0A📝 PR: {0}', inputs.pr_title) || '', inputs.dop_text != '' && format('%0A-------- {0}', inputs.dop_text) || '') }}
+            ${{ format('❌ Build failed for {0} in repository {1}.{2}{3}{4}', 
+              inputs.workflow, 
+              github.event.repository.name, 
+              inputs.trigger_actor != '' && format('%0A👤 User: {0}', inputs.trigger_actor) || '', 
+              inputs.pr_title != '' && format('%0A📝 Info: {0}', inputs.pr_title) || '', 
+              inputs.dop_text != '' && format('%0A-------- {0}', inputs.dop_text) || ''
+            ) }}

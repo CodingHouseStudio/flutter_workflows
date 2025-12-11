@@ -54,34 +54,13 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          format: markdown
+          format: html
           message: |
-            *${{ inputs.job_status == 'success' && '✅ Build Successful' || '❌ Build Failed' }}*
-
-            🔹 *Repo:* `${{ github.event.repository.name }}`
-            🔹 *Branch:* `${{ github.head_ref || github.ref_name }}`
-            🔹 *Workflow:* ${{ inputs.workflow }}
-            ${{ inputs.trigger_actor != '' && format('👤 *User:* {0}', steps.map_user.outputs.tg_user) || '' }}
-            ${{
-              inputs.pr_title != '' &&
-              format(
-                '📝 *PR:* {0}',
-                replace(
-                  replace(
-                    replace(
-                      replace(
-                        replace(
-                          replace(inputs.pr_title, '\', '\\\\'),
-                        '_', '\\_'),
-                      '*', '\\*'),
-                    '[', '\\['),
-                  ']', '\\]'),
-                '(' , '\(')
-                )
-                || ''
-            }}
-
-
-            ${{ inputs.dop_text != '' && format('_{0}_', inputs.dop_text) || '' }}
-
-            [🔗 View Run Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            <b>${{ inputs.job_status == 'success' && '✅ Build Successful' || '❌ Build Failed' }}</b>
+            🔹 <b>Repo:</b> ${{ github.event.repository.name }}
+            🔹 <b>Branch:</b> ${{ github.head_ref || github.ref_name }}
+            🔹 <b>Workflow:</b> ${{ inputs.workflow }}
+            ${{ inputs.trigger_actor != '' && format('👤 <b>User:</b> {0}', steps.map_user.outputs.tg_user) || '' }}
+            ${{ inputs.pr_title != '' && format('📝 <b>PR:</b> {0}', inputs.pr_title) || '' }}
+            ${{ inputs.dop_text != '' && format('<i>{0}</i>', inputs.dop_text) || '' }}
+            <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">🔗 View Run Logs</a>

@@ -70,14 +70,17 @@ jobs:
                   replace(
                     replace(
                       replace(
-                        replace(inputs.pr_title, '_', '\\_'),
+                        replace(
+                          replace(inputs.pr_title, '\', '\\\\'),
+                        '_', '\\_'),
                       '*', '\\*'),
                     '[', '\\['),
                   ']', '\\]'),
+                '(' , '\(')
                 )
-              )
-              || ''
+                || ''
             }}
+
 
             ${{ inputs.dop_text != '' && format('_{0}_', inputs.dop_text) || '' }}
 

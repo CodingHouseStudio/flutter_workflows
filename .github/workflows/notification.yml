@@ -62,7 +62,22 @@ jobs:
             🔹 *Branch:* `${{ github.head_ref || github.ref_name }}`
             🔹 *Workflow:* ${{ inputs.workflow }}
             ${{ inputs.trigger_actor != '' && format('👤 *User:* {0}', steps.map_user.outputs.tg_user) || '' }}
-            ${{ inputs.pr_title != '' && format('📝 *PR:* {0}', inputs.pr_title) || '' }}
+            ${{
+              inputs.pr_title != '' &&
+              format(
+                '📝 *PR:* {0}',
+                replace(
+                  replace(
+                    replace(
+                      replace(
+                        replace(inputs.pr_title, '_', '\\_'),
+                      '*', '\\*'),
+                    '[', '\\['),
+                  ']', '\\]'),
+                )
+              )
+              || ''
+            }}
 
             ${{ inputs.dop_text != '' && format('_{0}_', inputs.dop_text) || '' }}
 

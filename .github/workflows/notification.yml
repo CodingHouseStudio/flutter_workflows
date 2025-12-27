@@ -62,5 +62,4 @@ jobs:
             🔹 <b>Workflow:</b> ${{ inputs.workflow }}
             ${{ inputs.trigger_actor != '' && format('👤 <b>User:</b> {0}', steps.map_user.outputs.tg_user) || '' }}
             ${{ inputs.pr_title != '' && format('📝 <b>PR:</b> {0}', inputs.pr_title) || '' }}
-            ${{ inputs.dop_text != '' && format('<i>{0}</i>', inputs.dop_text) || '' }}
             <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">🔗 View Run Logs</a>

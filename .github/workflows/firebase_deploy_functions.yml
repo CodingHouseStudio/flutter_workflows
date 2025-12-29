@@ -25,6 +25,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: jsryudev/deploy-firebase-functions@v20.0.1
+      with:
+        only: ""
       env:
         FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         FUNCTIONS_DIR: ${{ vars.FIREBASE_FUNCTIONS_DIR }}

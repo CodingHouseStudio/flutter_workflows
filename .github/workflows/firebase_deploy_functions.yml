@@ -16,6 +16,10 @@ on:
         required: false
         type: string
         default: "ubuntu-latest"
+      FUNCTIONS:
+        required: false
+        type: string
+        default: ""
 
 jobs:
   deploy:
@@ -26,7 +30,7 @@ jobs:
     - uses: actions/checkout@v4
     - uses: jsryudev/deploy-firebase-functions@v20.0.1
       with:
-        only: ""
+        only: ${{ inputs.FUNCTIONS }}
       env:
         FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         FUNCTIONS_DIR: ${{ vars.FIREBASE_FUNCTIONS_DIR }}

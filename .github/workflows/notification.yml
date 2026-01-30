@@ -42,11 +42,26 @@ jobs:
             "AndrewKrash") TG_USER="@andriikrash" ;;
             "mykhailokurochkinwork") TG_USER="@kurochkinmy" ;;
             "herman-the-worm") TG_USER="@hermankravchenko" ;;
+            "ihor-greb-dev") TG_USER="@IgorGreb" ;;
+            "Oleksii556") TG_USER="@darkius" ;;
+            " oleksandr-mytko-codinghouse") TG_USER="@makedonsky77" ;;
             *) TG_USER="$GH_USER" ;;
           esac
 
           # Write to GITHUB_OUTPUT
           echo "tg_user=$TG_USER" >> $GITHUB_OUTPUT
+
+      - name: Escape PR title for HTML
+        id: escape_pr
+        run: |
+          PR_TITLE="${{ inputs.pr_title }}"
+
+          PR_TITLE_ESCAPED=$(echo "$PR_TITLE" \
+            | sed 's/&/\&amp;/g' \
+            | sed 's/</\&lt;/g' \
+            | sed 's/>/\&gt;/g')
+
+          echo "pr_title=$PR_TITLE_ESCAPED" >> $GITHUB_OUTPUT
 
       # 2. Use steps.map_user.outputs.tg_user
       - name: Send Telegram Notification
@@ -61,5 +76,5 @@ jobs:
             🔹 <b>Branch:</b> ${{ github.head_ref || github.ref_name }}
             🔹 <b>Workflow:</b> ${{ inputs.workflow }}
             ${{ inputs.trigger_actor != '' && format('👤 <b>User:</b> {0}', steps.map_user.outputs.tg_user) || '' }}
-            ${{ inputs.pr_title != '' && format('📝 <b>PR:</b> {0}', inputs.pr_title) || '' }}
+            ${{ inputs.pr_title != '' && format('📝 <b>PR:</b> {0}', steps.escape_pr.outputs.pr_title) || '' }}
             <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">🔗 View Run Logs</a>

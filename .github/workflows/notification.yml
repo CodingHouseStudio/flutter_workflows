@@ -31,12 +31,20 @@ jobs:
     timeout-minutes: 3
     runs-on: ${{ inputs.runs_on }}
     steps:
-      # 1. Map User and save to OUTPUT (not env)
-      - name: Map GitHub User to Telegram
-        id: map_user
+      - name: Prepare Telegram Message
+        id: prepare_msg
+        shell: bash
+        env:
+          # Use env vars to prevent script injection issues
+          GH_USER: "${{ inputs.trigger_actor }}"
+          PR_TITLE: "${{ inputs.pr_title }}"
+          WORKFLOW_NAME: "${{ inputs.workflow }}"
+          REPO_NAME: "${{ github.event.repository.name }}"
+          BRANCH_NAME: "${{ github.head_ref || github.ref_name }}"
+          JOB_STATUS: "${{ inputs.job_status }}"
+          RUN_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         run: |
-          GH_USER="${{ inputs.trigger_actor }}"
-
+          # 1. Map User
           case "$GH_USER" in
             "DemianKryk") TG_USER="@demiankryk" ;;
             "AndrewKrash") TG_USER="@andriikrash" ;;
@@ -44,37 +52,49 @@ jobs:
             "herman-the-worm") TG_USER="@hermankravchenko" ;;
             "ihor-greb-dev") TG_USER="@IgorGreb" ;;
             "Oleksii556") TG_USER="@darkius" ;;
-            " oleksandr-mytko-codinghouse") TG_USER="@makedonsky77" ;;
+            "oleksandr-mytko-codinghouse") TG_USER="@makedonsky77" ;;
             *) TG_USER="$GH_USER" ;;
           esac
 
-          # Write to GITHUB_OUTPUT
-          echo "tg_user=$TG_USER" >> $GITHUB_OUTPUT
+          # 2. Function to escape HTML special characters
+          escape_html() {
+            echo "$1" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g; s/"/\&quot;/g; s/'"'"'/\&#39;/g'
+          }
 
-      - name: Escape PR title for HTML
-        id: escape_pr
-        run: |
-          PR_TITLE="${{ inputs.pr_title }}"
+          # 3. Escape all variables
+          E_REPO=$(escape_html "$REPO_NAME")
+          E_BRANCH=$(escape_html "$BRANCH_NAME")
+          E_WORKFLOW=$(escape_html "$WORKFLOW_NAME")
+          E_USER=$(escape_html "$TG_USER")
+          E_PR=$(escape_html "$PR_TITLE")
 
-          PR_TITLE_ESCAPED=$(echo "$PR_TITLE" \
-            | sed 's/&/\&amp;/g' \
-            | sed 's/</\&lt;/g' \
-            | sed 's/>/\&gt;/g')
+          # 4. Build Status Line
+          if [ "$JOB_STATUS" = "success" ]; then
+            STATUS="<b>✅ Build Successful</b>"
+          else
+            STATUS="<b>❌ Build Failed</b>"
+          fi
 
-          echo "pr_title=$PR_TITLE_ESCAPED" >> $GITHUB_OUTPUT
+          # 5. Construct the final message
+          # We use a heredoc to build the message, then pipe to GITHUB_OUTPUT
+          {
+            echo "message<<EOF"
+            echo "$STATUS"
+            echo "🔹 <b>Repo:</b> $E_REPO"
+            echo "🔹 <b>Branch:</b> $E_BRANCH"
+            echo "🔹 <b>Workflow:</b> $E_WORKFLOW"
+            
+            [[ -n "$GH_USER" ]] && echo "👤 <b>User:</b> $E_USER"
+            [[ -n "$PR_TITLE" ]] && echo "📝 <b>PR:</b> $E_PR"
+            
+            echo "<a href=\"$RUN_URL\">🔗 View Run Logs</a>"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
 
-      # 2. Use steps.map_user.outputs.tg_user
       - name: Send Telegram Notification
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           format: html
-          message: |
-            <b>${{ inputs.job_status == 'success' && '✅ Build Successful' || '❌ Build Failed' }}</b>
-            🔹 <b>Repo:</b> ${{ github.event.repository.name }}
-            🔹 <b>Branch:</b> ${{ github.head_ref || github.ref_name }}
-            🔹 <b>Workflow:</b> ${{ inputs.workflow }}
-            ${{ inputs.trigger_actor != '' && format('👤 <b>User:</b> {0}', steps.map_user.outputs.tg_user) || '' }}
-            ${{ inputs.pr_title != '' && format('📝 <b>PR:</b> {0}', steps.escape_pr.outputs.pr_title) || '' }}
-            <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">🔗 View Run Logs</a>
+          message: ${{ steps.prepare_msg.outputs.message }}

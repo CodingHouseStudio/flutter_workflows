@@ -110,7 +110,16 @@ jobs:
                   echo "⚙️  Added excluded var as env: $env_var"
                 else
                   echo "✅ Added secret: $env_var"
-                  echo "$secret_value" | npx wrangler secret put "$env_var" ${{ inputs.FLAVOUR != 'production' && format('--env {0}', inputs.FLAVOUR) || '' }}
+                  if ! output=$(echo "$secret_value" | npx wrangler secret put "$env_var" ${{ inputs.FLAVOUR != 'production' && format('--env {0}', inputs.FLAVOUR) || '' }} 2>&1); then
+                    if [[ "$output" == *"already in use"* ]]; then
+                      echo "⚠️  Variable $env_var is already defined as a non-secret variable. Skipping secret creation."
+                    else
+                      echo "$output"
+                      exit 1
+                    fi
+                  else
+                    echo "$output"
+                  fi
                 fi
               fi
             fi

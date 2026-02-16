@@ -9,6 +9,11 @@ on:
         type: string
         default: "ubuntu-latest"
 
+      working_directory:
+        required: false
+        type: string
+        default: "."
+
 permissions:
   id-token: write # This is required for requesting the JWT
   contents: read # This is required for actions/checkout
@@ -17,6 +22,9 @@ jobs:
   ci:
     runs-on: ${{inputs.runs_on}} # We are using ubuntu to deploy flutter web
     timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_directory }}
     steps:
       - name: Checkout
         uses: actions/checkout@main
@@ -26,6 +34,7 @@ jobs:
         with:
           node-version: ${{ vars.NODE_FRAMEWORK_VERSION }}
           cache: npm
+          cache-dependency-path: ${{ inputs.working_directory }}/package-lock.json
 
       - name: 📦 Install Dependencies
         # npm ci instead of npm install to not overwrite package_lock.json

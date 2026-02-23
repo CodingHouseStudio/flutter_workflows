@@ -30,6 +30,10 @@ on:
         required: false
         type: string
         default: "."
+      accountId:
+        required: false
+        type: string
+        default: ""
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -130,7 +134,7 @@ jobs:
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{secrets.CLOUDFLARE_API_TOKEN}}
-          accountId: ${{secrets.CLOUDFLARE_ACCOUNT_ID}}
+          accountId: ${{ inputs.accountId || secrets.CLOUDFLARE_ACCOUNT_ID}}
           workingDirectory: ${{ inputs.working_directory }}
           command: deploy
           packageManager: npm
